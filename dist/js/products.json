@@ -1,0 +1,48 @@
+{
+  "products": [
+    {
+      "sku": "RC-HOOD-001",
+      "name": "Classified Hoodie",
+      "category": "Hoodies",
+      "price": 85,
+      "stock": "On hand",
+      "badge": "Limited",
+      "image": "assets/img/onPerson2.JPG",
+      "alt": "Classified hoodie with Remedi mark, model shot from behind",
+      "desc": "Mid-weight fleece hoodie with stealth print. Soft hand feel, relaxed fit."
+    },
+    {
+      "sku": "RC-TEE-001",
+      "name": "Stealth Tee",
+      "category": "Tops",
+      "price": 35,
+      "stock": "On hand",
+      "badge": "Limited",
+      "image": "assets/img/tShirt1.JPEG",
+      "alt": "Black Stealth tee on mannequin",
+      "desc": "Washed cotton tee with bunker-coded chest mark. True to size."
+    },
+    {
+      "sku": "RC-TEE-002",
+      "name": "Operator Tee",
+      "category": "Tops",
+      "price": 35,
+      "stock": "Preorder",
+      "badge": "Drop",
+      "image": "assets/img/tShirt2.png",
+      "alt": "Operator tee front graphic",
+      "desc": "Preorder item. Operator insignia graphic. Ships with drop batch."
+    },
+    {
+      "sku": "RC-HOOD-002",
+      "name": "Recon Hoodie",
+      "category": "Hoodies",
+      "price": 90,
+      "stock": "Low stock",
+      "badge": "Limited",
+      "image": "assets/img/onPerson1.JPEG",
+      "alt": "Recon hoodie detail shot",
+      "desc": "Heavyweight fleece, tonal embroidery. Limited remaining."
+    }
+  ]
+}
