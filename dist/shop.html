@@ -6,48 +6,46 @@
   <title>Remedi’s Closet — Shop</title>
   <meta name="description" content="Remedi’s Closet — exclusive, bunker-coded drops. Limited access." />
 
-  <!-- You are serving /dist/shop.html; this keeps relative paths like assets/... and data/... correct -->
+  <!-- Serve from /dist so assets/js resolve -->
   <base href="/dist/">
 
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
-  <!-- Google Fonts -->
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Varela+Round&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900&display=swap" rel="stylesheet">
 
-  <!-- Font Awesome -->
+  <!-- Icons + Bootstrap -->
   <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous" defer></script>
-
-  <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Site CSS -->
   <link href="css/styles.css" rel="stylesheet" />
 
   <style>
-    /* ===== THEME VARS (soft grayscale bunker) ===== */
+    /* ===== DARKER BUNKER THEME (soft charcoal, not pure black) ===== */
     :root{
       --show-nav: 1;
-      --bg-0:#1a1d21;
-      --bg-1:#22262b;
-      --panel:#2a2e33;
-      --card:#24282c;
-      --line:#3a3f45;
-      --text:#f1f3f5;
-      --muted:#b0b5bb;
-      --accent:#d62c2c;
 
-      /* glass */
-      --glass-bg: rgba(26,29,33,.55);
-      --glass-stroke: rgba(255,255,255,.08);
+      --bg-0:#0f1114;   /* page background */
+      --bg-1:#161a1f;   /* gradient stop */
+      --panel:#1b2026;  /* filter bar / panels */
+      --card:#181c22;   /* product cards */
+      --line:#2a3037;   /* hairlines */
+      --text:#e6e9ee;   /* primary text */
+      --muted:#97a0aa;  /* secondary text */
+      --accent:#d62c2c; /* infrared red */
+
+      --glass-bg: rgba(18,20,24,.55);
+      --glass-stroke: rgba(255,255,255,.06);
       --glass-blur: 12px;
     }
 
     html,body{height:100%;}
     body{
-      background: radial-gradient(1200px 600px at 50% -10%, #2a2e33 0%, #1a1d21 55%) fixed;
+      background: radial-gradient(1200px 560px at 50% -10%, var(--bg-1) 0%, var(--bg-0) 55%) fixed;
       color:var(--text);
       font-family:"Nunito", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Varela Round", sans-serif;
       letter-spacing:.01em;
@@ -56,7 +54,7 @@
     /* ===== NAV ===== */
     .navbar{
       display: calc(var(--show-nav) * 1) !important;
-      background: rgba(26,29,33,.9);
+      background: rgba(15,17,20,.85);
       backdrop-filter: blur(8px);
       border-bottom:1px solid var(--line);
     }
@@ -71,15 +69,13 @@
       display:grid;place-items:center;text-align:center;
       border-bottom:1px solid var(--line);
       background:
-        linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.75)),
+        linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.72)),
         url('assets/img/bg-masthead.jpg') center/cover no-repeat;
     }
-    .shop-hero h1{
-      text-transform:uppercase; letter-spacing:.18em; margin:0;
-    }
-    .shop-hero p{color:var(--muted); margin:.75rem 0 0}
+    .shop-hero h1{ text-transform:uppercase; letter-spacing:.18em; margin:0; }
+    .shop-hero p{ color:var(--muted); margin:.75rem 0 0 }
 
-    /* ===== CONTENT WRAPPER ===== */
+    /* ===== CONTENT ===== */
     main{ padding-top: clamp(1rem, 3vh, 2rem); }
 
     /* ===== FILTERS ===== */
@@ -88,14 +84,15 @@
       border:1px solid var(--line);
       border-radius:.9rem;
       padding:1rem;
+      box-shadow:0 14px 28px rgba(0,0,0,.25);
     }
     .filters-bar .form-control,
     .filters-bar .form-select{
-      background:#1e2226; color:var(--text); border:1px solid #32363b;
+      background:#12161b; color:var(--text); border:1px solid #333a42;
     }
-    .filters-bar .form-control::placeholder{color:#9399a1}
+    .filters-bar .form-control::placeholder{color:#8a929c}
 
-    /* ===== PRODUCT GRID ===== */
+    /* ===== PRODUCT CARD ===== */
     .product-card{
       position: relative;
       background:var(--card);
@@ -105,17 +102,18 @@
       display:flex;flex-direction:column;
       transition: transform .15s ease, border-color .15s ease, box-shadow .15s ease;
       overflow:hidden;
+      box-shadow:0 12px 26px rgba(0,0,0,.35);
     }
     .product-card:hover{
       transform:translateY(-2px);
       border-color:var(--accent);
-      box-shadow:0 14px 28px rgba(0,0,0,.35);
+      box-shadow:0 18px 34px rgba(0,0,0,.45), 0 0 0 1px color-mix(in oklab,var(--accent),transparent 80%);
     }
 
     .product-thumb{
       position: relative;
       aspect-ratio:1/1;
-      background:#1f2226;
+      background:#11151a;
       border-bottom:1px solid var(--line);
       overflow:hidden;
     }
@@ -126,17 +124,14 @@
     }
     .product-card:hover .product-thumb img{ transform:scale(1.06); filter:saturate(1.05) contrast(1.05); }
 
-    /* subtle top vignette for readability */
     .product-thumb::after{
       content:""; position:absolute; inset:0;
       background: linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0) 55%);
       pointer-events:none;
     }
-
-    /* Show a gentle placeholder if an image fails */
     .product-thumb.is-missing{display:grid;place-items:center;color:var(--muted);border:1px dashed var(--line);}
 
-    /* ===== GLASS OVERLAY ===== */
+    /* ===== GLASS OVERLAY (default grid) ===== */
     .product-glass{
       position:absolute; left:0; right:0; bottom:0;
       display:grid; gap:.45rem; padding:.9rem .95rem; color:var(--text);
@@ -153,8 +148,9 @@
     .product-card.glass-hover:focus-within .product-glass { transform: translateY(0%); }
 
     .product-title{ font-weight:800; letter-spacing:.04em; margin:0; text-shadow:0 1px 0 rgba(0,0,0,.35); }
-    .product-meta{ color:var(--muted); font-size:.92rem; }
-    .price{ font-weight:900; }
+    .product-meta{ color:var(--muted); font-size:.92rem }
+    .product-desc{ color:#c5cbd3; font-size:.9rem; margin:.25rem 0 0 }
+    .price{ font-weight:900 }
 
     .glass-row{ display:flex; align-items:center; justify-content:space-between; gap:.75rem; }
 
@@ -166,7 +162,6 @@
     }
     .btn-ghost:hover{ background: var(--accent); color:#fff; }
 
-    /* ===== BADGES ===== */
     .badge-soft{
       background: rgba(214,44,44,.15);
       color: var(--accent);
@@ -174,6 +169,29 @@
       padding:.25rem .45rem;
       border-radius:.45rem;
       font-size:.75rem;
+    }
+
+    /* ===== DUO MODE (exactly 1–2 products) ===== */
+    body.duo .filters-bar{ display:none !important; }
+    /* center the two big cards and widen the thumbs */
+    #productsGrid.duo{ max-width:1200px; margin-inline:auto; }
+    .duo .product-thumb{ aspect-ratio:16/9; }
+
+    /* in duo mode, show info as a regular card body (not glass overlay) */
+    .duo .product-glass{
+      position:static;
+      transform:none;
+      background:transparent;
+      border:0;
+      backdrop-filter:none;
+      padding:1rem 1rem 1.1rem;
+    }
+    .duo .product-card{
+      border-radius:1.1rem;
+      box-shadow:0 20px 44px rgba(0,0,0,.45);
+    }
+    .duo .product-card:hover{
+      box-shadow:0 26px 56px rgba(0,0,0,.55), 0 0 0 1px color-mix(in oklab,var(--accent),transparent 80%);
     }
 
     /* ===== FOOTER ===== */
@@ -218,7 +236,7 @@
     <div class="container">
 
       <!-- Filters -->
-      <div class="filters-bar mb-4">
+      <div class="filters-bar mb-4" id="filtersBar">
         <form class="row g-2 align-items-center" id="filtersForm">
           <div class="col-12 col-md-5">
             <label class="visually-hidden" for="search">Search</label>
@@ -252,8 +270,9 @@
       <!-- Products -->
       <section aria-labelledby="productsHeading">
         <h2 id="productsHeading" class="visually-hidden">Products</h2>
-        <!-- Auto-fit grid: 2 on phones, 3 on md, 4 on lg -->
-        <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4" id="productsGrid"></div>
+
+        <!-- Default grid; JS toggles to .duo when <= 2 items -->
+        <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center" id="productsGrid"></div>
       </section>
     </div>
   </main>
@@ -268,11 +287,23 @@
   <!-- JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- Products Renderer (JSON -> Cards) -->
+  <!-- Products Renderer -->
   <script>
   fetch('js/products.json')
     .then(r => r.json())
-    .then(data => renderProducts(data.products))
+    .then(data => {
+      const items = data.products || [];
+      renderProducts(items);
+
+      // DUO MODE: only 1–2 products → hide filters, bigger centered cards, info below image
+      if (items.length <= 2) {
+        document.body.classList.add('duo');
+        document.getElementById('filtersBar')?.classList.add('d-none');
+        const grid = document.getElementById('productsGrid');
+        grid.className = 'row g-4 justify-content-center duo row-cols-1 row-cols-lg-2';
+        grid.id = 'productsGrid'; // keep id
+      }
+    })
     .catch(() => { /* silent */ });
 
   function renderProducts(items) {
@@ -296,7 +327,7 @@
             >
           </div>
           <div class="product-glass">
-            <h3 class="product-title h6">${esc(p.name)}</h3>
+            <h3 class="product-title h6 mb-0">${esc(p.name)}</h3>
             <div class="product-meta">${meta}</div>
             <div class="glass-row">
               <div class="price">${price}</div>
@@ -321,6 +352,7 @@
     ));
   }
 
+  // Footer year + tiny cart bump
   document.getElementById('year').textContent = new Date().getFullYear();
   const cartCountEl = document.getElementById('cartCount');
   document.addEventListener('click', (e) => {
@@ -334,8 +366,6 @@
   document.getElementById('resetFilters')?.addEventListener('click', () => {
     document.getElementById('filtersForm').reset();
   });
-</script>
-
-
+  </script>
 </body>
 </html>

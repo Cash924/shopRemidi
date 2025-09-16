@@ -21,28 +21,6 @@
       "image": "assets/img/tShirt1.JPEG",
       "alt": "Black Stealth tee on mannequin",
       "desc": "Washed cotton tee with bunker-coded chest mark. True to size."
-    },
-    {
-      "sku": "RC-TEE-002",
-      "name": "Operator Tee",
-      "category": "Tops",
-      "price": 35,
-      "stock": "Preorder",
-      "badge": "Drop",
-      "image": "assets/img/tShirt2.png",
-      "alt": "Operator tee front graphic",
-      "desc": "Preorder item. Operator insignia graphic. Ships with drop batch."
-    },
-    {
-      "sku": "RC-HOOD-002",
-      "name": "Recon Hoodie",
-      "category": "Hoodies",
-      "price": 90,
-      "stock": "Low stock",
-      "badge": "Limited",
-      "image": "assets/img/onPerson1.JPEG",
-      "alt": "Recon hoodie detail shot",
-      "desc": "Heavyweight fleece, tonal embroidery. Limited remaining."
     }
   ]
 }
