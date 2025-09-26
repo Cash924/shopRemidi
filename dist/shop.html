@@ -193,6 +193,19 @@
     .duo .product-card:hover{
       box-shadow:0 26px 56px rgba(0,0,0,.55), 0 0 0 1px color-mix(in oklab,var(--accent),transparent 80%);
     }
+    /* ===== CHECKOUT CTA (tan, full-width) ===== */
+    .checkout-cta{
+      display:block; width:100%;
+      background: linear-gradient(180deg, #eadcc7, #e6d3b8);
+      color:#1b2026; text-align:center; text-decoration:none;
+      border:1px solid #d8c4a7; border-radius:1rem;
+      padding:1rem 1.1rem; font-weight:800; letter-spacing:.02em;
+      box-shadow:0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.5);
+      transition:transform .12s ease, box-shadow .12s ease, filter .2s ease;
+    }
+    .checkout-cta:hover{ filter:saturate(1.03); transform:translateY(-1px); box-shadow:0 18px 36px rgba(0,0,0,.28); }
+    .checkout-cta:active{ transform:translateY(0); box-shadow:0 12px 28px rgba(0,0,0,.22); }
+    .checkout-cta i{ margin-right:.5rem; }
 
     /* ===== FOOTER ===== */
     footer{ color:var(--muted); border-top:1px solid var(--line) }
@@ -273,6 +286,11 @@
 
         <!-- Default grid; JS toggles to .duo when <= 2 items -->
         <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center" id="productsGrid"></div>
+        <!-- Checkout CTA -->
+<a href="checkout.html" class="checkout-cta mt-3" aria-label="Go to checkout">
+  <i class="fas fa-lock"></i> Go To Checkout
+</a>
+
       </section>
     </div>
   </main>
@@ -285,87 +303,89 @@
   </footer>
 
   <!-- JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/cart.js"></script>
 
   <!-- Products Renderer -->
   <script>
-  fetch('js/products.json')
-    .then(r => r.json())
-    .then(data => {
-      const items = data.products || [];
-      renderProducts(items);
+let PRODUCTS = [];
 
-      // DUO MODE: only 1–2 products → hide filters, bigger centered cards, info below image
-      if (items.length <= 2) {
-        document.body.classList.add('duo');
-        document.getElementById('filtersBar')?.classList.add('d-none');
-        const grid = document.getElementById('productsGrid');
-        grid.className = 'row g-4 justify-content-center duo row-cols-1 row-cols-lg-2';
-        grid.id = 'productsGrid'; // keep id
-      }
-    })
-    .catch(() => { /* silent */ });
+fetch('js/products.json')
+  .then(r => r.json())
+  .then(data => {
+    PRODUCTS = data.products || [];
+    renderProducts(PRODUCTS);
 
-  function renderProducts(items) {
-    const grid = document.getElementById('productsGrid');
-    grid.innerHTML = items.map(cardHTML).join('');
-  }
+    // DUO MODE (<=2 products)
+    if (PRODUCTS.length <= 2) {
+      document.body.classList.add('duo');
+      document.getElementById('filtersBar')?.classList.add('d-none');
+      const grid = document.getElementById('productsGrid');
+      grid.className = 'row g-4 justify-content-center duo row-cols-1 row-cols-lg-2';
+    }
+  })
+  .catch(() => {});
 
-  function cardHTML(p) {
-    const price = formatUSD(p.price);
-    const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
-    const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
-    return `
-      <div class="col">
-        <article class="product-card glass-hover" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
-          <div class="product-thumb">
-            <img
-              src="${esc(p.image)}"
-              alt="${esc(p.alt || p.name)}"
-              loading="lazy"
-              onerror="this.closest('.product-thumb').classList.add('is-missing')"
-            >
+function renderProducts(items) {
+  const grid = document.getElementById('productsGrid');
+  grid.innerHTML = items.map(cardHTML).join('');
+}
+
+function cardHTML(p) {
+  const price = formatUSD(p.price);
+  const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
+  const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
+  return `
+    <div class="col">
+      <article class="product-card glass-hover" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
+        <div class="product-thumb">
+          <img src="${esc(p.image)}" alt="${esc(p.alt || p.name)}" loading="lazy"
+               onerror="this.closest('.product-thumb').classList.add('is-missing')">
+        </div>
+        <div class="product-glass">
+          <h3 class="product-title h6 mb-0">${esc(p.name)}</h3>
+          <div class="product-meta">${meta}</div>
+          <div class="glass-row">
+            <div class="price">${price}</div>
+            ${badge}
           </div>
-          <div class="product-glass">
-            <h3 class="product-title h6 mb-0">${esc(p.name)}</h3>
-            <div class="product-meta">${meta}</div>
-            <div class="glass-row">
-              <div class="price">${price}</div>
-              ${badge}
-            </div>
-            ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
-            <button class="btn-ghost" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
-              <i class="fas fa-key me-1"></i> Add to Cart
-            </button>
-          </div>
-        </article>
-      </div>
-    `;
-  }
+          ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
+          <button class="btn-ghost" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
+            <i class="fas fa-key me-1"></i> Add to Cart
+          </button>
+        </div>
+      </article>
+    </div>
+  `;
+}
 
-  function formatUSD(n){
-    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-  }
-  function esc(s){
-    return String(s).replace(/[&<>"']/g, m => (
-      {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]
-    ));
-  }
+function formatUSD(n){
+  return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
+}
+function esc(s){
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
 
-  // Footer year + tiny cart bump
-  document.getElementById('year').textContent = new Date().getFullYear();
-  const cartCountEl = document.getElementById('cartCount');
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('.btn-ghost');
-    if (!btn) return;
-    if (cartCountEl) cartCountEl.textContent = String((+cartCountEl.textContent || 0) + 1);
-    btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
-    setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
-  });
+// REAL add-to-cart
+document.addEventListener('click', (e) => {
+  const btn = e.target.closest('button.btn-ghost[data-sku]');
+  if (!btn) return;
+  const sku = btn.dataset.sku;
+  const prod = PRODUCTS.find(p => String(p.sku) === sku);
+  if (!prod) return;
 
-  document.getElementById('resetFilters')?.addEventListener('click', () => {
-    document.getElementById('filtersForm').reset();
-  });
-  </script>
+  Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
+
+  btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
+  setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
+});
+
+document.getElementById('resetFilters')?.addEventListener('click', () => {
+  document.getElementById('filtersForm').reset();
+});
+
+document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
 </body>
 </html>

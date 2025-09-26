@@ -5,240 +5,60 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Remedi’s Closet — Checkout</title>
   <meta name="description" content="Secure checkout — Remedi’s Closet." />
-
-  <!-- Keep /dist-relative paths working when serving dist/ directly -->
   <base href="/dist/">
 
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
-
-  <!-- Fonts & Icons -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Varela+Round&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900&display=swap" rel="stylesheet">
   <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous" defer></script>
-
-  <!-- Bootstrap + site CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="css/styles.css" rel="stylesheet" />
-
   <style>
-    /* =========================
-       THEME / BASE
-    ========================== */
-    :root{
-      --bg-0:#181b1f;       /* page charcoal */
-      --panel:#ffffff;      /* form card */
-      --summary:#f6f2ef;    /* order card */
-      --ink:#222;           /* primary text */
-      --muted:#6c757d;      /* secondary text */
-      --line:#ebe5e2;       /* subtle borders */
-      --accent:#d62c2c;     /* bunker red */
-      --pill:#f6f3f1;       /* input background */
-    }
+    :root{--bg-0:#181b1f;--panel:#fff;--summary:#f6f2ef;--ink:#222;--muted:#6c757d;--line:#ebe5e2;--accent:#d62c2c;--pill:#f6f3f1}
     html,body{height:100%}
-    body{
-      background: radial-gradient(1200px 600px at 50% -10%, #23272c 0%, var(--bg-0) 55%) fixed;
-      color:var(--ink);
-      font-family:"Nunito", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Varela Round", sans-serif;
-      letter-spacing:.01em;
-    }
-
-    /* =========================
-       NAV
-    ========================== */
-    .navbar{
-      background: rgba(24,27,31,.9);
-      backdrop-filter: blur(8px);
-      border-bottom: 1px solid rgba(255,255,255,.08);
-    }
-    .navbar .nav-link{ color:#cfd4da !important }
-    .navbar .nav-link:hover{ color:#fff !important }
-    .navbar-brand{ color:#fff !important; letter-spacing:.08em; text-transform:uppercase; font-weight:800; }
-
-    /* =========================
-       HERO
-    ========================== */
-    .hero-slim{
-      min-height: 28vh;
-      display:grid;place-items:center;text-align:center;
-      color:#fff;
-      border-bottom: 1px solid rgba(255,255,255,.08);
-      background:
-        linear-gradient(180deg, rgba(0,0,0,.25), rgba(0,0,0,.6)),
-        url('assets/img/bg-masthead.jpg') center/cover no-repeat;
-    }
-    .hero-slim h1{ letter-spacing:.18em; text-transform:uppercase; margin:0 }
-
-    /* =========================
-       LAYOUT
-    ========================== */
-    .checkout-shell{ max-width:1120px; margin-inline:auto; padding:clamp(16px,2.5vw,28px); }
-    .checkout-grid{ display:grid; gap:clamp(16px,2vw,24px); grid-template-columns:1.05fr .95fr; }
-    @media (max-width: 992px){ .checkout-grid{ grid-template-columns:1fr; } }
-
-    /* =========================
-       CARDS
-    ========================== */
-    .summary-card,.form-card{
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:clamp(14px,2.2vw,22px);
-      box-shadow:0 10px 24px rgba(0,0,0,.08);
-      background:var(--panel);
-    }
-    .summary-card{ background:var(--summary); }
-    .card-title{ font-weight:800; letter-spacing:.02em }
-
-    /* small “Neutral” chip in header */
-    .chip{
-      display:inline-flex; align-items:center; gap:.4rem;
-      padding:.22rem .55rem; border-radius:999px; border:1px solid #e1dbd7;
-      background:#fff; color:#222; font-size:.72rem; font-weight:800; text-transform:uppercase;
-    }
-    .chip .dot{ width:.42rem; height:.42rem; border-radius:50%; background:#bbb; display:inline-block; }
-
-    /* =========================
-       SECTION LABELS / INPUTS
-    ========================== */
-    .section-label{
-      display:block; font-size:.8rem; font-weight:800; letter-spacing:.06em;
-      color:#6b7280; text-transform:uppercase; margin:.25rem 0 .35rem;
-    }
-    .form-control,.form-select{
-      background:var(--pill); border:1px solid #e3dedb; border-radius:12px; padding:.65rem .85rem;
-    }
-    .form-control:focus,.form-select:focus{ border-color:#bdb6b3; box-shadow:0 0 0 3px rgba(0,0,0,.05); }
-
-    /* Apple Pay style button */
-    .applepay-btn{
-      display:flex; align-items:center; justify-content:center;
-      width:100%; height:46px; border-radius:12px; border:0;
-      background:#000; color:#fff; font-weight:700; letter-spacing:.01em;
-      font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text",system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial,sans-serif;
-    }
-    .applepay-btn i{ margin-right:.35rem; }
-
-    /* =========================
-       PAYMENT METHODS
-    ========================== */
-    .pay-method{ border:1px solid #ece6e2; border-radius:14px; padding:12px; }
-    .method-row{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding:10px 6px; border-bottom:1px solid #eee7e3;
-    }
-    .method-row:last-child{ border-bottom:0 }
-
-    /* Card fields */
-    .cc{ margin-top:.5rem; }
-    .cc-number{ font-variant-numeric:tabular-nums; letter-spacing:.04em; }
-    .cc-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-    @media (max-width:480px){ .cc-row{ grid-template-columns:1fr; } }
-
-    /* =========================
-       ORDER ITEMS LIST
-    ========================== */
-    #orderItems{ display:grid; gap:12px; margin-top:.25rem; }
-    @media (min-width:1200px){ #orderItems{ gap:14px; } }
-
-    .item{
-      display:grid; grid-template-columns:84px 1fr auto; gap:14px; align-items:center;
-      padding:12px; background:#fff; border:1px solid var(--line); border-radius:16px;
-      box-shadow:0 6px 16px rgba(0,0,0,.06);
-      transition:transform .15s ease, border-color .15s ease, box-shadow .15s ease;
-    }
-    .item:hover{ transform:translateY(-1px); border-color:#e2dbd7; box-shadow:0 10px 24px rgba(0,0,0,.08); }
-    .item img{
-      width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid #eee7e3;background:#faf8f7;
-      image-rendering:auto;
-    }
-    .item-name{ font-weight:800; letter-spacing:.02em; display:flex; align-items:center; gap:.4rem }
-    .subrow{ display:flex; align-items:center; gap:.75rem; margin-top:.25rem }
-    .price-col{ min-width:86px; text-align:right }
-    .remove-link{ color:#8b9198; font-size:.9rem; text-decoration:none }
-    .remove-link:hover{ color:#000; text-decoration:underline }
-
-    /* Limited chip (smaller, crisper) — includes a basic fallback before color-mix */
-    .tag-limited{
-      --fg:#cf2e2e;
-      color:var(--fg);
-      border-radius:999px; padding:.12rem .40rem; font-size:.62rem; font-weight:800; text-transform:uppercase;
-      background:rgba(207,46,46,.08); /* fallback */
-      border:1px solid rgba(207,46,46,.35); /* fallback */
-      letter-spacing:.03em; line-height:1;
-      background: color-mix(in oklab, var(--fg), white 90%);
-      border:1px solid color-mix(in oklab, var(--fg), black 72%);
-    }
-    .tag-limited::before{
-      content:""; width:.32rem; height:.32rem; border-radius:50%;
-      background:var(--fg); display:inline-block; margin-right:.3rem;
-      box-shadow:0 0 .35rem rgba(207,46,46,.4);
-      vertical-align:-1px;
-    }
-
-    /* Qty control (no native spinners) */
-    .qty-control{
-      display:inline-flex; align-items:center; gap:.25rem; padding:.2rem;
-      border:1px solid #e3dedb; border-radius:999px; background:#f6f3f1;
-    }
-    .qty-btn{
-      width:28px;height:28px;border-radius:999px;border:0;background:#fff;cursor:pointer;
-      font-weight:900; line-height:1; box-shadow:0 1px 0 rgba(0,0,0,.05);
-      transition:transform .06s ease, background .2s ease;
-    }
-  /* Qty styles */
-.qty-btn:active { transform: scale(.96); }
-
-.qty-input {
-  width: 44px;
-  text-align: center;
-  border: 0;
-  background: transparent;
-  font-weight: 700;
-}
-
-.qty-input:focus { outline: none; }
-
-/* Hide number input arrows and keep custom +/- */
-.qty-input[type="number"]::-webkit-outer-spin-button,
-.qty-input[type="number"]::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.qty-input[type="number"] {
-  appearance: textfield;      /* standard */
-  -moz-appearance: textfield; /* Firefox */
-}
-
-
-    /* Promo + totals */
-    .btn-ghost{ border:1px solid var(--accent); color:var(--accent); background:rgba(214,44,44,.06); border-radius:999px; font-weight:800; }
-    .btn-ghost:hover{ background:var(--accent); color:#fff; }
-    .totals .row{ padding:.25rem 0 }
-    .totals .grand{ border-top:1px dashed #e0dad7; margin-top:.35rem; padding-top:.6rem }
-
-    /* Footer */
-    .foot-note{ color:#adb5bd }
-
-    /* Phone tweaks */
-    @media (max-width:420px){
-      .item{ grid-template-columns:64px 1fr auto; padding:10px; border-radius:14px; }
-      .item img{ width:64px; height:64px; border-radius:10px; }
-      .price-col{ min-width:72px; font-size:.95rem; }
-      .qty-btn{ width:26px; height:26px; }
-      .qty-input{ width:40px; }
-    }
+    body{background:radial-gradient(1200px 600px at 50% -10%,#23272c 0%,var(--bg-0) 55%) fixed;color:var(--ink);font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Varela Round",sans-serif;letter-spacing:.01em}
+    .navbar{background:rgba(24,27,31,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .navbar .nav-link{color:#cfd4da!important}.navbar .nav-link:hover{color:#fff!important}
+    .navbar-brand{color:#fff!important;letter-spacing:.08em;text-transform:uppercase;font-weight:800}
+    .hero-slim{min-height:28vh;display:grid;place-items:center;text-align:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.6)),url('assets/img/bg-masthead.jpg') center/cover no-repeat}
+    .hero-slim h1{letter-spacing:.18em;text-transform:uppercase;margin:0}
+    .checkout-shell{max-width:1120px;margin-inline:auto;padding:clamp(16px,2.5vw,28px)}
+    .checkout-grid{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:1.05fr .95fr}
+    @media (max-width:992px){.checkout-grid{grid-template-columns:1fr}}
+    .summary-card,.form-card{border:1px solid var(--line);border-radius:16px;padding:clamp(14px,2.2vw,22px);box-shadow:0 10px 24px rgba(0,0,0,.08);background:var(--panel)}
+    .summary-card{background:var(--summary)} .card-title{font-weight:800;letter-spacing:.02em}
+    .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .55rem;border-radius:999px;border:1px solid #e1dbd7;background:#fff;color:#222;font-size:.72rem;font-weight:800;text-transform:uppercase}
+    .chip .dot{width:.42rem;height:.42rem;border-radius:50%;background:#bbb;display:inline-block}
+    .section-label{display:block;font-size:.8rem;font-weight:800;letter-spacing:.06em;color:#6b7280;text-transform:uppercase;margin:.25rem 0 .35rem}
+    .form-control,.form-select{background:var(--pill);border:1px solid #e3dedb;border-radius:12px;padding:.65rem .85rem}
+    .form-control:focus,.form-select:focus{border-color:#bdb6b3;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+    .btn-ghost{border:1px solid var(--accent);color:var(--accent);background:rgba(214,44,44,.06);border-radius:999px;font-weight:800}
+    .btn-ghost:hover{background:var(--accent);color:#fff}
+    .totals .row{padding:.25rem 0}.totals .grand{border-top:1px dashed #e0dad7;margin-top:.35rem;padding-top:.6rem}
+    .foot-note{color:#adb5bd}
+    #orderItems{display:grid;gap:12px;margin-top:.25rem}
+    .item{display:grid;grid-template-columns:84px 1fr auto;gap:14px;align-items:center;padding:12px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+    .item img{width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid #eee7e3;background:#faf8f7}
+    .qty-control{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem;border:1px solid #e3dedb;border-radius:999px;background:#f6f3f1}
+    .qty-btn{width:28px;height:28px;border-radius:999px;border:0;background:#fff;cursor:pointer;font-weight:900;line-height:1}
+    .qty-input{width:44px;text-align:center;border:0;background:transparent;font-weight:700}
+    /* Apple Pay pill look */
+    .applepay-btn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;border-radius:12px;border:0;background:#000;color:#fff;font-weight:700;letter-spacing:.01em}
+    .applepay-btn i{margin-right:.4rem}
+    /* Loading overlay */
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:9999}
+    .overlay.show{display:flex}
+    .spinner{width:40px;height:40px;border-radius:50%;border:4px solid #fff;border-top-color:transparent;animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
   </style>
 </head>
 <body>
-
-  <!-- NAV -->
   <nav class="navbar navbar-expand-lg fixed-top" aria-label="Primary">
     <div class="container">
       <a class="navbar-brand" href="index.html">Remedi’s Closet</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
-              aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
         <i class="fas fa-bars"></i>
       </button>
       <div class="collapse navbar-collapse" id="navMenu">
@@ -251,7 +71,6 @@
     </div>
   </nav>
 
-  <!-- HERO -->
   <header class="hero-slim mt-5">
     <div class="container">
       <h1>Checkout</h1>
@@ -259,35 +78,29 @@
     </div>
   </header>
 
-  <!-- CONTENT -->
   <main class="checkout-shell">
     <div class="checkout-grid">
-
-      <!-- LEFT: ORDER SUMMARY -->
+      <!-- LEFT -->
       <section class="summary-card">
         <div class="d-flex align-items-center justify-content-between mb-2">
           <h2 class="card-title h5 mb-0">Order summary</h2>
           <span class="chip"><span class="dot"></span> Neutral</span>
         </div>
-
         <div id="orderItems" class="mb-2"></div>
 
-        <!-- Promo -->
         <div class="d-flex gap-2 mb-2">
           <input id="promoInput" class="form-control" placeholder="Promo code (e.g. SAVE10)" aria-label="Promo code">
-          <button id="applyPromo" class="btn btn-ghost" disabled>Apply</button>
+          <button id="applyPromo" class="btn btn-ghost" type="button" disabled>Apply</button>
         </div>
 
-        <!-- Shipping speed -->
         <div class="d-flex gap-2 align-items-center mb-2">
           <label class="small text-muted me-2" for="shipMethod">Shipping</label>
           <select id="shipMethod" class="form-select" style="max-width:220px">
-            <option value="0">Standard — Free</option>
-            <option value="10">Rush — $10.00</option>
+            <option value="standard">Standard — Free</option>
+            <option value="rush">Rush — $10.00</option>
           </select>
         </div>
 
-        <!-- Totals -->
         <div class="totals mt-2">
           <div class="row"><div class="col">Subtotal</div><div class="col-auto" id="subtotal" aria-live="polite">$0</div></div>
           <div class="row text-success d-none" id="discountRow">
@@ -300,94 +113,40 @@
         </div>
       </section>
 
-      <!-- RIGHT: PAYMENT FORM -->
+      <!-- RIGHT -->
       <section class="form-card">
         <h2 class="card-title h5 mb-3">Payment</h2>
 
-        <button type="button" class="applepay-btn mb-3" aria-label="Apple Pay (demo)">
-          <i class="fab fa-apple"></i> Pay
+        <button type="button" class="applepay-btn mb-3" aria-label="Apple Pay or Cash App">
+          <i class="fab fa-apple"></i> Pay (Wallets on Stripe)
         </button>
 
-        <!-- Contact -->
         <div class="mb-3">
           <span class="section-label">Contact</span>
           <label class="form-label small text-muted" for="email" hidden>Email</label>
-          <input id="email" type="email" class="form-control" placeholder="email@example.com" autocomplete="email">
+          <input id="email" type="email" class="form-control" placeholder="email@example.com" autocomplete="email" required>
         </div>
 
-        <!-- Shipping address -->
         <div class="mb-3">
           <div class="d-flex align-items-center justify-content-between">
             <span class="section-label mb-0">Shipping address</span>
             <a href="#manual" class="small text-muted text-decoration-underline">Enter address manually</a>
           </div>
           <div class="row g-2">
-            <div class="col-12"><input class="form-control" placeholder="Full name" autocomplete="name"></div>
+            <div class="col-12"><input id="fullName" class="form-control" placeholder="Full name" autocomplete="name" required></div>
             <div class="col-12 col-md-6">
               <select id="country" class="form-select" autocomplete="country">
                 <option>United States</option><option>Canada</option><option>United Kingdom</option>
               </select>
             </div>
-            <div class="col-12 col-md-6"><input id="address" class="form-control" placeholder="Address" autocomplete="address-line1"></div>
-            <div class="col-6 col-md-4"><input class="form-control" placeholder="City" autocomplete="address-level2"></div>
-            <div class="col-3 col-md-4"><input id="state" class="form-control" placeholder="State/Prov." autocomplete="address-level1"></div>
-            <div class="col-3 col-md-4"><input id="zip" class="form-control" placeholder="ZIP" autocomplete="postal-code" inputmode="numeric"></div>
+            <div class="col-12 col-md-6"><input id="address" class="form-control" placeholder="Address" autocomplete="address-line1" required></div>
+            <div class="col-6 col-md-4"><input id="city" class="form-control" placeholder="City" autocomplete="address-level2" required></div>
+            <div class="col-3 col-md-4"><input id="state" class="form-control" placeholder="State/Prov." autocomplete="address-level1" required></div>
+            <div class="col-3 col-md-4"><input id="zip" class="form-control" placeholder="ZIP" autocomplete="postal-code" inputmode="numeric" required></div>
           </div>
         </div>
 
-        <!-- Methods -->
-        <div class="section-label">Payment method</div>
-        <div class="pay-method mb-3">
-          <!-- Card -->
-          <div class="method-row">
-            <div>
-              <input class="form-check-input me-2" type="radio" name="pm" id="pm-card" checked>
-              <label for="pm-card" class="form-check-label">Card</label>
-            </div>
-            <!-- tiny network badges; swap to local assets later if preferred -->
-            <img src="https://img.icons8.com/color/28/visa.png" alt="Visa" width="28" height="28" loading="lazy">
-          </div>
-
-          <div class="cc mt-2">
-            <label class="section-label" for="cc-number">Card number</label>
-            <input id="cc-number" class="form-control cc-number" placeholder="1234 1234 1234 1234" inputmode="numeric" aria-label="Card number">
-            <div class="cc-row mt-2">
-              <div>
-                <label class="section-label" for="cc-exp">Expiry</label>
-                <input id="cc-exp" class="form-control" placeholder="MM / YY" aria-label="Expiry">
-              </div>
-              <div>
-                <label class="section-label" for="cc-cvc">CVC</label>
-                <input id="cc-cvc" class="form-control" placeholder="CVC" aria-label="CVC" inputmode="numeric">
-              </div>
-            </div>
-          </div>
-
-          <!-- Other methods (visual only) -->
-          <div class="method-row mt-3">
-            <div>
-              <input class="form-check-input me-2" type="radio" name="pm" id="pm-cashapp">
-              <label for="pm-cashapp" class="form-check-label">Cash App Pay</label>
-            </div>
-            <span class="small text-muted">Available on mobile</span>
-          </div>
-
-          <!-- Cash joke -->
-          <div class="method-row">
-            <div>
-              <input class="form-check-input me-2" type="radio" name="pm" id="pm-cash">
-              <label for="pm-cash" class="form-check-label">Cash (in person)</label>
-            </div>
-            <span class="small text-muted">lol no</span>
-          </div>
-        </div>
-
-        <div class="form-check mb-3">
-          <input class="form-check-input" type="checkbox" value="" id="saveInfo">
-          <label class="form-check-label small" for="saveInfo">Save my info for faster checkout.</label>
-        </div>
-
-        <button id="payBtn" class="btn btn-dark w-100 py-2 fw-bold">Pay</button>
+        <button id="payBtn" class="btn btn-dark w-100 py-2 fw-bold" type="button">Pay</button>
 
         <div class="d-flex justify-content-between small mt-3 text-muted">
           <a href="#" class="text-decoration-underline">Free returns & exchanges</a>
@@ -401,166 +160,138 @@
     </div>
   </main>
 
-  <!-- JS -->
+  <!-- simple loading overlay -->
+  <div class="overlay" id="overlay"><div class="spinner" aria-hidden="true"></div></div>
+
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="js/cart.js"></script>
   <script>
-    // --- Demo cart with two products ---
-    const CART = [
-      { sku:'RC-HOOD-001', name:'Classified Hoodie', price:85, qty:1, image:'assets/img/onPerson2.JPG' },
-      { sku:'RC-TEE-002',  name:'Operator Tee',     price:35, qty:1, image:'assets/img/tShirt2.png' }
-    ];
-
+    // ------- Cart preview -------
+    let CART = Cart.load();
     const fmtUSD = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(n);
-
     const els = {
-      items: document.getElementById('orderItems'),
-      subtotal: document.getElementById('subtotal'),
-      discountRow: document.getElementById('discountRow'),
-      discountName: document.getElementById('discountName'),
-      discount: document.getElementById('discount'),
-      shipping: document.getElementById('shipping'),
-      tax: document.getElementById('tax'),
-      total: document.getElementById('grandTotal'),
-      promo: document.getElementById('promoInput'),
-      applyPromo: document.getElementById('applyPromo'),
-      shipMethod: document.getElementById('shipMethod'),
-      country: document.getElementById('country'),
-      zip: document.getElementById('zip'),
-      year: document.getElementById('year'),
-      payBtn: document.getElementById('payBtn'),
+      items: orderItems, subtotal: subtotal, discountRow: discountRow, discountName: discountName,
+      discount: discount, shipping: shipping, tax: tax, total: grandTotal,
+      promo: promoInput, applyPromo: applyPromo, shipMethod: shipMethod,
+      email: email, fullName: fullName, address: address, city: city, state: state, zip: zip, country: country,
+      payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay')
     };
-    els.year.textContent = new Date().getFullYear();
+    document.getElementById('year').textContent = new Date().getFullYear();
 
-    // Render items (static UI demo)
     function renderItems(){
-      els.items.innerHTML = CART.map((it, i)=>{
-        const limited = (it.sku === 'RC-HOOD-001');
-        return `
-          <article class="item">
-            <img src="${it.image}" alt="${it.name}" loading="lazy" decoding="async">
-            <div>
-              <div class="item-name">
-                ${it.name}
-                ${limited ? '<span class="tag-limited">Limited</span>' : ''}
+      if (!CART.length){
+        els.items.innerHTML = '<div class="text-muted small">Your bag is empty. <a href="shop.html">Continue shopping</a>.</div>';
+        recalc(); return;
+      }
+      els.items.innerHTML = CART.map((it,i)=>`
+        <article class="item">
+          <img src="${it.image}" alt="${it.name}" loading="lazy">
+          <div>
+            <div class="item-name">${it.name} ${it.sku==='RC-HOOD-001'?'<span class="tag-limited">Limited</span>':''}</div>
+            <div class="text-muted small">${fmtUSD(it.price)}</div>
+            <div class="subrow">
+              <div class="qty-control" data-i="${i}">
+                <button class="qty-btn" data-delta="-1" type="button" aria-label="Decrease">−</button>
+                <input class="qty-input" type="number" min="0" value="${it.qty}" data-i="${i}" aria-label="Quantity">
+                <button class="qty-btn" data-delta="1" type="button" aria-label="Increase">+</button>
               </div>
-              <div class="text-muted small">${fmtUSD(it.price)}</div>
-              <div class="subrow">
-                <div class="qty-control" data-i="${i}">
-                  <button class="qty-btn" data-delta="-1" type="button" aria-label="Decrease quantity">−</button>
-                  <input class="qty-input" type="number" min="0" value="${it.qty}" data-i="${i}" aria-label="Quantity">
-                  <button class="qty-btn" data-delta="1" type="button" aria-label="Increase quantity">+</button>
-                </div>
-                <a href="#" class="remove-link" data-remove="${i}">Remove</a>
-              </div>
+              <a href="#" class="remove-link" data-remove="${i}">Remove</a>
             </div>
-            <div class="price-col fw-bold">${fmtUSD(it.price * it.qty)}</div>
-          </article>
-        `;
-      }).join('');
+          </div>
+          <div class="price-col fw-bold">${fmtUSD(it.price*it.qty)}</div>
+        </article>`).join('');
     }
-
-    // Math
-    function subtotal(){ return CART.reduce((s,i)=>s + i.price*i.qty, 0); }
-    function shipping(){ return Number(els.shipMethod.value||0); }
+    function calcSubtotal(){ return CART.reduce((s,i)=>s+i.price*i.qty,0) }
+    function calcShipping(){ return (els.shipMethod.value==='rush') ? 10 : 0 }
     function estTax(taxable){
       const us = (els.country.value||'').includes('United States');
       const zipOk = (els.zip.value||'').trim().length >= 5;
-      return (us && zipOk) ? taxable * 0.08 : 0; // demo only
+      return (us && zipOk) ? taxable * 0.08 : 0;
     }
-    let coupon = null; // {code:'SAVE10', pct:0.10}
-    function discountAmount(sub){
-      if(!coupon) return 0;
-      if(coupon.pct) return sub * coupon.pct;
-      if(coupon.amount) return Math.min(coupon.amount, sub);
-      return 0;
-    }
+    let coupon = null;
+    function discountAmount(sub){ return coupon?.pct ? sub*coupon.pct : 0 }
     function recalc(){
-      const sub = subtotal();
+      const sub = calcSubtotal();
       const disc = discountAmount(sub);
-      const ship = shipping();
+      const ship = calcShipping();
       const taxable = Math.max(0, sub - disc);
-      const tax = estTax(taxable);
-      const total = Math.max(0, taxable + ship + tax);
-
+      const taxAmt = estTax(taxable);
+      const total = Math.max(0, taxable + ship + taxAmt);
       els.subtotal.textContent = fmtUSD(sub);
-      if(disc > 0){
-        els.discountRow.classList.remove('d-none');
-        els.discountName.textContent = coupon.code;
-        els.discount.textContent = '-' + fmtUSD(disc);
-      } else {
-        els.discountRow.classList.add('d-none');
-      }
+      if(disc>0){ els.discountRow.classList.remove('d-none'); els.discountName.textContent = 'SAVE10'; els.discount.textContent = '-' + fmtUSD(disc); }
+      else { els.discountRow.classList.add('d-none'); }
       els.shipping.textContent = fmtUSD(ship);
-      els.tax.textContent = fmtUSD(tax);
+      els.tax.textContent = fmtUSD(taxAmt);
       els.total.textContent = fmtUSD(total);
     }
-
-    // Qty +/- and Remove
-    els.items.addEventListener('click', (e)=>{
-      const qtyBtn = e.target.closest('.qty-btn');
-      if (qtyBtn){
-        const delta = Number(qtyBtn.dataset.delta || 0);
-        const idx = Number(qtyBtn.closest('.qty-control').dataset.i);
-        CART[idx].qty = Math.max(0, (CART[idx].qty||0) + delta);
-        if (CART[idx].qty === 0) CART.splice(idx,1);
-        renderItems(); recalc();
-        return;
+    orderItems.addEventListener('click', (e)=>{
+      const btn = e.target.closest('.qty-btn');
+      if(btn){
+        const d = +btn.dataset.delta, idx = +btn.closest('.qty-control').dataset.i;
+        CART[idx].qty = Math.max(0,(CART[idx].qty||0)+d);
+        if(CART[idx].qty===0) CART.splice(idx,1);
+        Cart.save(CART); Cart.syncBadge(); renderItems(); recalc(); return;
       }
       const i = e.target.dataset.remove;
-      if(i !== undefined){
-        e.preventDefault();
-        CART.splice(i,1);
-        renderItems(); recalc();
-      }
+      if(i!==undefined){ e.preventDefault(); CART.splice(i,1); Cart.save(CART); Cart.syncBadge(); renderItems(); recalc(); }
     });
-
-    // Manual qty edits (digits only)
-    els.items.addEventListener('input', (e)=>{
-      if (!e.target.classList.contains('qty-input')) return;
+    orderItems.addEventListener('input',(e)=>{
+      if(!e.target.classList.contains('qty-input')) return;
       const idx = +e.target.dataset.i;
-      const clean = Math.max(0, parseInt(String(e.target.value).replace(/\D+/g,'' || '0'),10) || 0);
-      CART[idx].qty = clean;
-      e.target.value = clean;
-      if(clean === 0){ CART.splice(idx,1); }
-      renderItems(); recalc();
+      const clean = Math.max(0, parseInt(String(e.target.value).replace(/\D+/g,''),10) || 0);
+      CART[idx].qty = clean; e.target.value = clean; if(clean===0) CART.splice(idx,1);
+      Cart.save(CART); Cart.syncBadge(); renderItems(); recalc();
     });
+    promoInput.addEventListener('input',()=>{ applyPromo.disabled = !(promoInput.value||'').trim(); });
+    applyPromo.addEventListener('click',()=>{ const code=(promoInput.value||'').trim().toUpperCase(); coupon = (code==='SAVE10')?{pct:.10}:null; recalc(); });
 
-    // Promo code (demo)
-    els.promo.addEventListener('input', ()=>{
-      els.applyPromo.disabled = !(els.promo.value||'').trim();
-    });
-    els.applyPromo.addEventListener('click', ()=>{
-      const code = (els.promo.value||'').trim().toUpperCase();
-      if(!code){ coupon = null; recalc(); return; }
-      if(code === 'SAVE10'){ coupon = {code, pct:0.10}; }
-      else if(code === 'FREESHIP'){ coupon = {code, amount: shipping() || 0}; }
-      else { coupon = null; }
-      recalc();
-    });
+    renderItems(); recalc(); Cart.syncBadge();
 
-    // Shipping / tax demo updates
-    els.shipMethod.addEventListener('change', recalc);
-    els.country.addEventListener('change', recalc);
-    els.zip.addEventListener('input', recalc);
+    // ------- Stripe Checkout redirect -------
+    async function startStripeCheckout(){
+      if (!CART.length){ alert('Your cart is empty.'); return; }
+      const payload = {
+        email: els.email.value.trim(),
+        full_name: fullName.value.trim(),
+        address: address.value.trim(),
+        city: city.value.trim(),
+        state: state.value.trim(),
+        zip: zip.value.trim(),
+        country: country.value,
+        ship_method: shipMethod.value,
+        promo_code: (promoInput.value||'').trim(),
+        cart: CART.map(i => ({ sku:i.sku, qty:i.qty }))
+      };
+      if (!payload.email){ alert('Please enter your email.'); return; }
 
-    // Cash joke: bounce back to card
-    document.querySelector('.pay-method').addEventListener('change', (e)=>{
-      if (e.target && e.target.id === 'pm-cash') {
-        setTimeout(()=>{
-          alert("Sike 😅 We don’t take cash. Try card or Cash App Pay.");
-          document.getElementById('pm-card').checked = true;
-        }, 50);
+      try{
+        setLoading(true);
+        const res = await fetch('https://remedis-apt3bg9j4-apollos-projects-3e5223cb.vercel.app/api/checkoutRedirect', {
+          method:'POST',
+          headers:{'Content-Type':'application/json'},
+          body: JSON.stringify(payload)
+        });
+        const data = await res.json().catch(()=>null);
+        if(!res.ok || !data?.url) throw new Error(data?.error || 'Checkout error');
+        window.location = data.url; // to Stripe hosted Checkout
+      }catch(err){
+        console.error(err);
+        alert('Could not start checkout. Please try again.');
+      }finally{
+        setLoading(false);
       }
-    });
+    }
 
-    // Pay (demo only)
-    els.payBtn.addEventListener('click', (e)=>{
-      e.preventDefault();
-      alert('Demo UI only.\nWire this button to Stripe when you’re ready.');
-    });
+    function setLoading(on){
+      els.overlay.classList.toggle('show', on);
+      els.payBtn.disabled = on;
+      if (els.appleBtn) els.appleBtn.disabled = on;
+      els.payBtn.textContent = on ? 'Redirecting…' : 'Pay';
+    }
 
-    // init
-    renderItems(); recalc();
+    // Hook up both buttons
+    document.getElementById('payBtn').addEventListener('click', startStripeCheckout);
+    document.querySelector('.applepay-btn')?.addEventListener('click', startStripeCheckout);
   </script>
 </body>
 </html>
