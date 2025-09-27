@@ -11201,3 +11201,102 @@ body {
 .footer {
   padding: 5rem 0;
 }
+/* Transparent Nav (shop style) */
+.rc-nav {
+  background: rgba(24,27,31,0.35);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+  transition: background 0.3s ease, box-shadow 0.3s ease;
+}
+
+.rc-nav.scrolled {
+  background: rgba(24,27,31,0.85);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.rc-nav .navbar-brand {
+  color: #fff !important;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rc-nav .nav-link {
+  color: #e4e8ec !important;
+  font-weight: 500;
+}
+
+.rc-nav .nav-link:hover,
+.rc-nav .nav-link:focus {
+  color: #fff !important;
+}
+
+.rc-nav .nav-link.nav-link-muted {
+  opacity: 0.85;
+}
+
+.rc-nav .nav-link.nav-link-muted:hover {
+  opacity: 1;
+}
+
+.badge-soft {
+  background: rgba(255,255,255,.15);
+  color: #fff;
+  border-radius: 999px;
+  padding: .15rem .5rem;
+  font-size: .7rem;
+  font-weight: 700;
+}
+/* Brand style only */
+.rc-brand {
+  font-family: "Varela Round", system-ui, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff !important;
+}
+
+.rc-brand-main {
+  color: #c6b8ff; /* soft lavender */
+  text-shadow: 0 0 10px rgba(198, 184, 255, 0.4);
+}
+
+.rc-brand-sub {
+  color: #ffffffb3; /* soft white */
+}
+/* Base navbar style (transparent start) */
+.rc-nav {
+  transition: background-color 0.4s ease, backdrop-filter 0.4s ease, box-shadow 0.4s ease;
+  background-color: rgba(24, 27, 31, 0); /* fully transparent */
+  backdrop-filter: blur(0px);
+  border-bottom: 1px solid transparent;
+}
+
+/* When scrolled */
+.rc-nav.scrolled {
+  background-color: rgba(24, 27, 31, 0.85); /* semi-opaque */
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Brand text */
+.rc-brand {
+  font-family: "Varela Round", system-ui, sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.rc-brand-main {
+  color: #c6b8ff;
+  text-shadow: 0 0 10px rgba(198, 184, 255, 0.4);
+}
+
+.rc-brand-sub {
+  color: #ffffffb3;
+}
+.rc-nav.checkout {
+  background-color: rgba(20, 20, 20, 0.9);
+  backdrop-filter: blur(12px);
+}

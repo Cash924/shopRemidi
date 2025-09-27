@@ -214,27 +214,32 @@
 <body id="shop-page">
 
   <!-- ===== NAV ===== -->
-  <nav class="navbar navbar-expand-lg fixed-top" aria-label="Primary">
-    <div class="container">
-      <a class="navbar-brand" href="index.html">Remedi’s Closet</a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu"
-              aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation">
-        <i class="fas fa-bars"></i>
-      </button>
-      <div class="collapse navbar-collapse" id="navMenu">
-        <ul class="navbar-nav ms-auto align-items-lg-center">
-          <li class="nav-item"><a class="nav-link" href="index.html">Enter</a></li>
-          <li class="nav-item"><a class="nav-link active" aria-current="page" href="shop.html">Shop</a></li>
-          <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
-          <li class="nav-item ms-lg-3">
-            <a class="btn btn-sm btn-outline-light" href="checkout.html" aria-label="View cart">
-              <i class="fas fa-lock me-1"></i> Cart <span id="cartCount" class="badge badge-soft ms-1" aria-live="polite">0</span>
-            </a>
-          </li>
-        </ul>
-      </div>
+<nav class="navbar navbar-expand-lg fixed-top rc-nav" aria-label="Shop Navigation">
+  <div class="container px-4 px-lg-5">
+    <a class="navbar-brand rc-brand" href="index.html">
+      <span class="rc-brand-main">REMEDI’S</span> <span class="rc-brand-sub">CLOSET</span>
+    </a>
+
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navShopMenu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navShopMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Entrance</a></li>
+        <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
+        <li class="nav-item ms-lg-3">
+          <a class="btn btn-sm btn-outline-light" href="checkout.html">
+            <i class="fas fa-lock me-1"></i> Cart
+            <span id="cartCount" class="badge badge-soft ms-1" aria-live="polite">0</span>
+          </a>
+        </li>
+      </ul>
     </div>
-  </nav>
+  </div>
+</nav>
+
+
 
   <!-- ===== HERO ===== -->
   <header class="shop-hero">
@@ -305,87 +310,103 @@
   <!-- JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="js/cart.js"></script>
+<!-- Products (from Stripe via your server) -->
+<script>
+  // Use your deployed API domain
+  const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
 
-  <!-- Products Renderer -->
-  <script>
-let PRODUCTS = [];
+  let PRODUCTS = [];
 
-fetch('js/products.json')
-  .then(r => r.json())
-  .then(data => {
-    PRODUCTS = data.products || [];
-    renderProducts(PRODUCTS);
+  fetch(CATALOG_API, { credentials: 'omit' })
+    .then(r => r.json())
+    .then(data => {
+      PRODUCTS = data?.products || [];
 
-    // DUO MODE (<=2 products)
-    if (PRODUCTS.length <= 2) {
-      document.body.classList.add('duo');
-      document.getElementById('filtersBar')?.classList.add('d-none');
-      const grid = document.getElementById('productsGrid');
-      grid.className = 'row g-4 justify-content-center duo row-cols-1 row-cols-lg-2';
-    }
-  })
-  .catch(() => {});
+      // Optional fallbacks if Stripe products don’t have images
+      for (const p of PRODUCTS) {
+        if (!p.image) {
+          if (p.sku === 'RC-HAT-001')  p.image = 'assets/img/ipad.jpg';
+          if (p.sku === 'RC-TEE-001')  p.image = 'assets/img/onPerson2.JPG';
+        }
+      }
 
-function renderProducts(items) {
-  const grid = document.getElementById('productsGrid');
-  grid.innerHTML = items.map(cardHTML).join('');
-}
+      renderProducts(PRODUCTS);
 
-function cardHTML(p) {
-  const price = formatUSD(p.price);
-  const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
-  const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
-  return `
-    <div class="col">
-      <article class="product-card glass-hover" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
-        <div class="product-thumb">
-          <img src="${esc(p.image)}" alt="${esc(p.alt || p.name)}" loading="lazy"
-               onerror="this.closest('.product-thumb').classList.add('is-missing')">
-        </div>
-        <div class="product-glass">
-          <h3 class="product-title h6 mb-0">${esc(p.name)}</h3>
-          <div class="product-meta">${meta}</div>
-          <div class="glass-row">
-            <div class="price">${price}</div>
-            ${badge}
+      // DUO MODE (<= 2 products)
+      if (PRODUCTS.length <= 2) {
+        document.body.classList.add('duo');
+        document.getElementById('filtersBar')?.classList.add('d-none');
+        const grid = document.getElementById('productsGrid');
+        grid.className = 'row g-4 justify-content-center duo row-cols-1 row-cols-lg-2';
+      }
+    })
+    .catch(err => {
+      console.error('Catalog fetch error:', err);
+      // (Optional) fallback to local file:
+      // fetch('js/products.json').then(r=>r.json()).then(j => { PRODUCTS = j.products||[]; renderProducts(PRODUCTS); });
+    });
+
+  function renderProducts(items) {
+    const grid = document.getElementById('productsGrid');
+    grid.innerHTML = items.map(cardHTML).join('');
+  }
+
+  function cardHTML(p) {
+    const price = formatUSD(p.price);
+    const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
+    const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
+    return `
+      <div class="col">
+        <article class="product-card glass-hover" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
+          <div class="product-thumb">
+            <img src="${esc(p.image)}" alt="${esc(p.alt || p.name)}" loading="lazy"
+                 onerror="this.closest('.product-thumb').classList.add('is-missing')">
           </div>
-          ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
-          <button class="btn-ghost" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
-            <i class="fas fa-key me-1"></i> Add to Cart
-          </button>
-        </div>
-      </article>
-    </div>
-  `;
-}
+          <div class="product-glass">
+            <h3 class="product-title h6 mb-0">${esc(p.name)}</h3>
+            <div class="product-meta">${meta}</div>
+            <div class="glass-row">
+              <div class="price">${price}</div>
+              ${badge}
+            </div>
+            ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
+            <button class="btn-ghost" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
+              <i class="fas fa-key me-1"></i> Add to Cart
+            </button>
+          </div>
+        </article>
+      </div>
+    `;
+  }
 
-function formatUSD(n){
-  return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
-}
-function esc(s){
-  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-}
+  function formatUSD(n){
+    return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
+  }
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
 
-// REAL add-to-cart
-document.addEventListener('click', (e) => {
-  const btn = e.target.closest('button.btn-ghost[data-sku]');
-  if (!btn) return;
-  const sku = btn.dataset.sku;
-  const prod = PRODUCTS.find(p => String(p.sku) === sku);
-  if (!prod) return;
+  // REAL add-to-cart (unchanged)
+  document.addEventListener('click', (e) => {
+    const btn = e.target.closest('button.btn-ghost[data-sku]');
+    if (!btn) return;
+    const sku = btn.dataset.sku;
+    const prod = PRODUCTS.find(p => String(p.sku) === sku);
+    if (!prod) return;
 
-  Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
+    Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
 
-  btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
-  setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
-});
+    btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
+    setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
+  });
 
-document.getElementById('resetFilters')?.addEventListener('click', () => {
-  document.getElementById('filtersForm').reset();
-});
+  document.getElementById('resetFilters')?.addEventListener('click', () => {
+    document.getElementById('filtersForm').reset();
+  });
 
-document.getElementById('year').textContent = new Date().getFullYear();
+  document.getElementById('year').textContent = new Date().getFullYear();
 </script>
+
 
 </body>
 </html>
