@@ -1,490 +1,579 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-        <meta name="description" content="" />
-        <meta name="author" content="" />
-       <title>Remedi’s Closet — Access Granted</title>
-<meta name="description" content="Remedi’s Closet: secret bunker storefront. Limited drops. Clearance required.">
-<script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous" defer></script>
-        <!-- Google fonts-->
-        <link href="https://fonts.googleapis.com/css?family=Varela+Round" rel="stylesheet" />
-        <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet" />
-        <!-- Core theme CSS (includes Bootstrap)-->
-        <link href="css/styles.css" rel="stylesheet" />
-     <style>
-  /* === BUNKER PACK ====================================== */
-  :root{
-    --accent-infrared:#e03a3a;   /* red */
-    --accent-night:#58ff7d;      /* night-vision green (optional) */
-    --bunker-accent: var(--accent-infrared); /* switch to --accent-night if you want */
-  }
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <title>Remedi’s Closet — Access Granted</title>
+    <meta
+      name="description"
+      content="Remedi’s Closet: limited drops, quiet luxury, intentional design."
+    />
+    <script
+      src="https://use.fontawesome.com/releases/v6.3.0/js/all.js"
+      crossorigin="anonymous"
+      defer
+    ></script>
 
-  /* Add .bunker-hover to any image/card container */
-  .bunker-hover{ position:relative; overflow:hidden; }
+    <!-- Google fonts -->
+    <link
+      href="https://fonts.googleapis.com/css?family=Varela+Round"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
+      rel="stylesheet"
+    />
 
-  /* scanlines */
-  .bunker-hover::before{
-    content:""; position:absolute; inset:0;
-    background:repeating-linear-gradient(
-      to bottom,
-      rgba(255,255,255,.04) 0 1px,
-      rgba(0,0,0,.08) 1px 2px
-    );
-    mix-blend-mode:overlay; opacity:.25; pointer-events:none;
-    transition:opacity .25s ease;
-  }
+    <!-- Core theme CSS (includes Bootstrap) -->
+    <link href="css/styles.css" rel="stylesheet" />
 
-  /* infrared sweep */
-  .bunker-hover::after{
-    content:""; position:absolute; left:0; right:0; top:-160%; height:160%;
-    background:linear-gradient(
-      to bottom,
-      transparent 0 45%,
-      rgba(224,58,58,.65) 50%,
-      transparent 55% 100%
-    );
-    filter:blur(.5px) saturate(1.1); opacity:.55; pointer-events:none;
-    transform:translateY(0);
-    transition:transform .9s cubic-bezier(.2,.6,.2,1), opacity .3s;
-  }
-  .bunker-hover:hover::after{ transform:translateY(160%); }
-  .bunker-hover:hover::before{ opacity:.35; }
+    <!-- Page-local polish -->
+    <style>
+      :root {
+        --accent-infrared: #e03a3a;
+        --bunker-accent: var(--accent-infrared);
+      }
 
-  /* glow on hover */
-  .product-card.bunker-hover:hover,
-  .feature-pane.dark-pane.bunker-hover:hover{
-    border-color: var(--bunker-accent);
-    box-shadow:0 14px 28px rgba(0,0,0,.35),
-               0 0 0 1px color-mix(in oklab, var(--bunker-accent), transparent 70%);
-  }
+      /* ---------- nav scroll state ---------- */
+      .rc-nav.scrolled {
+        background: rgba(6, 8, 10, 0.9) !important;
+        backdrop-filter: blur(6px);
+        box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+      }
+      .rc-brand-main {
+        font-weight: 900;
+        letter-spacing: 0.02em;
+      }
+      .rc-brand-sub {
+        opacity: 0.8;
+        letter-spacing: 0.12em;
+      }
 
-  /* keycard button */
-  .btn-keycard{
-    --k: var(--bunker-accent);
-    border:1px dashed color-mix(in oklab, var(--k), black 10%);
-    color:var(--k); background:rgba(0,0,0,.03);
-    text-transform:uppercase; letter-spacing:.08em; font-weight:800;
-  }
-  .btn-keycard:hover{ background:var(--bunker-accent); color:#0f1113; border-style:solid; }
+      /* ---------- bunker product visuals ---------- */
+      .feature-media {
+        position: relative;
+        border-radius: 0.6rem;
+        overflow: hidden;
+        min-height: 520px;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+        background: #0f1113;
+      }
+      .feature-media__img {
+        position: absolute;
+        inset: 0;
+        background-size: cover;
+        background-position: center;
+        transform: scale(1.02);
+        transition: transform 0.35s ease;
+      }
+      .feature-media:hover .feature-media__img {
+        transform: scale(1.06);
+      }
+      .media-overlay {
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          80% 80% at 50% 50%,
+          rgba(0, 0, 0, 0) 0%,
+          rgba(0, 0, 0, 0.22) 100%
+        );
+        pointer-events: none;
+      }
 
-  /* ----- Bunker chip badges (polished) ----- */
-  .badge-soft{
-    --bg: rgba(0,0,0,.04);
-    --fg: #222;
-    --bd: rgba(0,0,0,.12);
+      .ribbon {
+        position: absolute;
+        top: 14px;
+        left: -10px;
+        background: #e03131;
+        color: #fff;
+        font-size: 0.73rem;
+        letter-spacing: 0.04em;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 0.35rem 0.6rem;
+        transform: rotate(-6deg);
+        box-shadow: 0 6px 18px rgba(224, 49, 49, 0.25);
+        border-radius: 0.25rem;
+      }
+      .ribbon--drop {
+        background: #0ea5e9;
+        box-shadow: 0 6px 18px rgba(14, 165, 233, 0.25);
+      }
 
-    display:inline-flex;
-    align-items:center;
-    gap:.35rem;
+      .feature-pane {
+        border-radius: 0.6rem;
+        padding: 1.75rem;
+        border: 1px solid rgba(0, 0, 0, 0.06);
+      }
+      .pane--light {
+        background: #fff;
+        border-color: rgba(0, 0, 0, 0.06);
+      }
+      .pane--dark {
+        background: #0f1113;
+        color: #e9ecef;
+        border-color: rgba(255, 255, 255, 0.08);
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
 
-    padding:.26rem .55rem .28rem;
-    border-radius:999px;
-    border:1px solid var(--bd);
-    background: var(--bg);
-    color: var(--fg);
+      .bunker-title {
+        letter-spacing: 0.1px;
+        font-weight: 800;
+      }
+      .bunker-meta {
+        font-size: 0.95rem;
+        opacity: 0.9;
+      }
+      .tag {
+        display: inline-block;
+        line-height: 1;
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        padding: 0.35rem 0.5rem;
+        border-radius: 0.35rem;
+        border: 1px solid transparent;
+      }
+      .tag--limited {
+        background: #ffe3e3;
+        color: #9b2226;
+        border-color: #ffc9c9;
+      }
+      .tag--drop {
+        background: #c7eefc;
+        color: #0b5568;
+        border-color: #aee8fb;
+      }
 
-    font-size:.73rem;
-    font-weight:800;
-    text-transform:uppercase;
-    letter-spacing:.06em;
-    line-height:1;
+      .hover-pop {
+        transition: transform 0.22s ease, box-shadow 0.22s ease, filter 0.22s ease;
+        will-change: transform, box-shadow, filter;
+      }
+      .hover-pop:hover {
+        transform: translateY(-4px) scale(1.015);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
+        filter: saturate(1.03);
+      }
 
-    position:relative; top:-1px;
-  }
+      .btn-keycard {
+        background: #101826;
+        color: #fff;
+        border: none;
+        padding: 0.65rem 0.95rem;
+        border-radius: 0.45rem;
+        letter-spacing: 0.02em;
+        transition: transform 0.15s ease, box-shadow 0.15s ease,
+          background 0.15s ease;
+      }
+      .btn-keycard:hover {
+        transform: translateY(-1px);
+        background: #0b1220;
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.22);
+        color: #fff;
+      }
 
-  .badge-soft::before{
-    content:"";
-    width:.38rem; height:.38rem; border-radius:50%;
-    background: var(--fg);
-    box-shadow:0 0 .35rem color-mix(in oklab, var(--fg), transparent 60%);
-    opacity:.9;
-  }
+      /* clamp long blurbs in panes */
+      .feature-pane p {
+        line-height: 1.5;
+      }
+      .clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
 
-  .badge-soft.limited{
-    --fg: #cf2e2e; /* infrared red */
-    --bg: color-mix(in oklab, #cf2e2e, white 88%);
-    --bd: color-mix(in oklab, #cf2e2e, black 72%);
-  }
+      /* ---------- video section ---------- */
+      .feature-video-section {
+        background: radial-gradient(
+            120% 120% at 50% 0%,
+            rgba(255, 255, 255, 0.02) 0%,
+            rgba(0, 0, 0, 0.75) 60%
+          ),
+          #000;
+        padding: 5rem 0;
+      }
+      .video-frame {
+        position: relative;
+        width: 100%;
+        padding-top: 56.25%;
+        overflow: hidden;
+        border-radius: 0.75rem;
+        background: #0b1220;
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+      }
+      .video-frame iframe {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
 
-  .badge-soft.drop{
-    --fg: #5c3cf0; /* drop purple */
-    --bg: color-mix(in oklab, #5c3cf0, white 88%);
-    --bd: color-mix(in oklab, #5c3cf0, black 72%);
-  }
+      /* ---------- action cards ---------- */
+      .action-card {
+        border: 1px solid rgba(0, 0, 0, 0.08);
+        border-radius: 0.6rem;
+      }
+      .action-card .fa-brands,
+      .action-card .fa-solid {
+        font-size: 1.15rem;
+      }
+      .action-card .fa-brands:hover {
+        opacity: 0.75;
+      }
 
-  /* automatic tuning on dark panes/cards */
-  .dark-pane .badge-soft{
-    --bg: color-mix(in oklab, var(--fg), black 85%);
-    --bd: color-mix(in oklab, var(--fg), black 40%);
-    color: var(--fg);
-  }
+      @media (prefers-reduced-motion: reduce) {
+        .hover-pop,
+        .feature-media__img {
+          transition: none !important;
+        }
+      }
+    </style>
+  </head>
 
-  /* subtle hover pulse when parent has bunker-hover */
-  .bunker-hover:hover .badge-soft::before{
-    box-shadow:0 0 .55rem color-mix(in oklab, var(--fg), transparent 30%);
-  }
-
-  /* nicer spacing in headings */
-  h4 .badge-soft{ margin-left:.35rem; }
-
-  @media (prefers-reduced-motion:reduce){
-    .bunker-hover::after{ transition:none; }
-  }
-</style>
-
-    </head>
-    
-    <body id="page-top">
-        <!-- Navigation-->
+  <body id="page-top">
+    <!-- Navigation -->
     <nav class="navbar navbar-expand-lg fixed-top rc-nav" aria-label="Primary">
-  <div class="container px-4 px-lg-5">
-    <a class="navbar-brand rc-brand" href="#page-top">
-      <span class="rc-brand-main">REMEDI’S</span> <span class="rc-brand-sub">CLOSET</span>
-    </a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu">
-      <i class="fas fa-bars"></i>
-    </button>
-    <div class="collapse navbar-collapse" id="navMenu">
-      <ul class="navbar-nav ms-auto align-items-lg-center">
-        <li class="nav-item"><a class="nav-link" href="index.html">Entrance</a></li>
-        <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
-        <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
-        <li class="nav-item ms-lg-3">
-          <a class="btn btn-sm btn-outline-light" href="checkout.html" aria-label="View cart">
-            <i class="fas fa-lock me-1"></i> Cart
-            <span id="cartCount" class="badge badge-soft ms-1" aria-live="polite">0</span>
-          </a>
-        </li>
-      </ul>
+      <div class="container px-4 px-lg-5">
+        <a class="navbar-brand rc-brand" href="#page-top">
+          <span class="rc-brand-main">REMEDI’S</span>
+          <span class="rc-brand-sub">CLOSET</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navMenu"
+        >
+          <i class="fas fa-bars"></i>
+        </button>
+        <div class="collapse navbar-collapse" id="navMenu">
+          <ul class="navbar-nav ms-auto align-items-lg-center">
+            <li class="nav-item">
+              <a class="nav-link" href="index.html">Entrance</a>
+            </li>
+            <li class="nav-item"><a class="nav-link" href="shop.html">Shop</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="checkout.html">Checkout</a>
+            </li>
+            <li class="nav-item ms-lg-3">
+              <a class="btn btn-sm btn-outline-light" href="checkout.html" aria-label="View cart">
+                <i class="fas fa-lock me-1"></i> Cart
+                <span id="cartCount" class="badge badge-soft ms-1" aria-live="polite">0</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Masthead -->
+    <header class="masthead">
+      <div
+        class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center"
+      >
+        <div class="d-flex justify-content-center">
+          <div class="text-center">
+            <h1 class="mx-auto my-0 text-uppercase">Remedi's Closet</h1>
+            <h2 class="text-white-50 mx-auto mt-2 mb-5">
+              Every piece blends minimal design with quiet confidence — premium
+              materials, limited runs, timeless form.
+            </h2>
+            <a class="btn btn-primary" href="#about">Click here</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- About -->
+<!-- About -->
+<section class="about-section text-center" id="about">
+  <div class="container position-relative">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <h2 class="text-white mb-3">Refined. Minimal. Intentional.</h2>
+        <p class="text-white-50">
+          A curated selection of timeless pieces. Limited runs. Intentional design.
+          For those who don’t need to say much.
+        </p>
+      </div>
     </div>
   </div>
-</nav>
-
-
-
-        <!-- Masthead-->
-        <header class="masthead">
-            <div class="container px-4 px-lg-5 d-flex h-100 align-items-center justify-content-center">
-                <div class="d-flex justify-content-center">
-                    <div class="text-center">
-                        <h1 class="mx-auto my-0 text-uppercase">Remedi's Closet</h1>
-                        <h2 class="text-white-50 mx-auto mt-2 mb-5">Every piece blends minimal design with quiet confidence — premium materials, limited runs, and timeless form.</h2>
-                        <a class="btn btn-primary" href="#about">Click here</a>
-                    </div>
-                </div>
-            </div>
-        </header>
-        <!-- About-->
-        <section class="about-section text-center" id="about">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5 justify-content-center">
-                    <div class="col-lg-8">
-                        <h2 class="text-white mb-4">Refined. Minimal. Intentional.</h2>
-                       <p class="text-white-50">
-                          A curated selection of timeless pieces.  
-                          Limited runs. Intentional design. For those who don’t need to say much.
-                        </p>
-                    </div>
-                </div>
-                <img class="img-fluid" src="assets/img/ipad.png" alt="..." />
-            </div>
-        </section>
-<!-- Projects (dynamic, bunker-styled) -->
-<section class="projects-section bg-light" id="projects">
-  <div class="container px-4 px-lg-5" id="featured-products"></div>
 </section>
 
-<script>
-  (function () {
-    const API_BASE = 'https://remedis-api.vercel.app';
-    const $ = (h) => h.trim();
-    const TARGET = document.getElementById('featured-products');
-    const money = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
-    const esc = (s) => String(s || '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-    const ribbonText = (badge) => {
-      const b = String(badge||'').toLowerCase();
-      if (!b) return '';
-      if (b.includes('limited')) return 'Limited';
-      if (b.includes('drop') || b.includes('pre')) return 'Drop';
-      return badge;
-    };
 
-    function row(p, i) {
-      const alt = i % 2 === 1;                // swap layout
-      const darkPane = i % 2 === 1;           // every other pane is dark
-      const img = esc(p.image || 'assets/img/bg-masthead.jpg');
-      const name = esc(p.name);
-      const desc = esc(p.desc || '');
-      const cat  = esc(p.category || '');
-      const stock = esc(p.stock || '');
-      const badge = ribbonText(p.badge || '');
-      const price = money.format(Number(p.price || 0));
-      const sku   = esc(p.sku || '');
+    <!-- Projects (dynamic) -->
+    <section class="projects-section bg-light" id="projects">
+      <div class="container px-4 px-lg-5" id="featured-products"></div>
+    </section>
 
-      const media = `
-        <div class="${alt ? 'col-lg-6 order-lg-2' : 'col-lg-7'} mb-3 mb-lg-0">
-          <div class="feature-media hover-pop">
-            <div class="feature-media__img" style="background-image:url('${img}')"></div>
-            ${badge ? `<div class="ribbon ribbon--${badge.toLowerCase()}">${badge}</div>` : ''}
-            <div class="media-overlay"></div>
-          </div>
-        </div>`;
-
-      const pane = `
-        <div class="${alt ? 'col-lg-6 order-lg-1 pe-lg-4' : 'col-lg-5 ps-lg-4'}">
-          <div class="feature-pane ${darkPane ? 'pane--dark text-center text-lg-end' : 'pane--light'} hover-pop d-flex flex-column justify-content-center h-100">
-            <h4 class="mb-2 bunker-title">${name}${
-              badge ? ` <span class="tag tag--${badge.toLowerCase()} align-middle ms-1">${badge}</span>` : ''
-            }</h4>
-            ${desc ? `<p class="${darkPane ? 'text-white-50' : 'text-muted'} mb-3">${desc}</p>` : ''}
-            <div class="mb-3 bunker-meta">
-              <strong>${price}</strong>
-              <span class="${darkPane ? 'text-white-50' : 'text-muted'}">
-                ${cat ? ` • ${cat}` : ''}${stock ? ` • ${stock}` : ''}
-              </span>
+    <!-- Feature Video (replaces email signup) -->
+    <section class="feature-video-section">
+      <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5 justify-content-center">
+          <div class="col-lg-8 text-center">
+            <i class="fa-solid fa-play fa-2x mb-3 text-white-50"></i>
+            <h2 class="text-white mb-3">Latest Visual</h2>
+            <p class="text-white-50 mb-4">Press play. Then shop the look.</p>
+            <div class="video-frame shadow-lg">
+              <iframe
+                src="https://www.youtube.com/embed/oELUIO3nIO8?rel=0&modestbranding=1&color=white"
+                title="Remedi — Official Video"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen
+              ></iframe>
             </div>
-            <a class="btn btn-sm btn-keycard" href="shop.html?sku=${sku}">View in Shop</a>
           </div>
-        </div>`;
+        </div>
+      </div>
+    </section>
 
-      return `<div class="row gx-0 ${i === 0 ? 'mb-4 mb-lg-5' : 'mb-4'} align-items-stretch">
-        ${alt ? media + pane : media + pane}
-      </div>`;
-    }
+    <!-- Actions -->
+    <section class="contact-section bg-black">
+      <div class="container px-4 px-lg-5">
+        <div class="row gx-4 gx-lg-5">
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100 action-card">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-bag-shopping text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Shop the Drop</h4>
+                <hr class="my-4 mx-auto" />
+                <div class="small text-black-50">Limited pieces, live now.</div>
+                <a class="btn btn-sm btn-keycard mt-3" href="shop.html"
+                  >Enter Shop</a
+                >
+              </div>
+            </div>
+          </div>
 
-    async function load() {
-      try {
-        const r = await fetch(`${API_BASE}/api/catalog`, { credentials: 'omit' });
-        const data = await r.json();
-        const items = Array.isArray(data.products) ? data.products : [];
-        if (!items.length) {
-          TARGET.innerHTML = `<div class="text-center text-muted py-5">Products inbound from the bunker…</div>`;
-          return;
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100 action-card">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-headphones text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Listen & Follow</h4>
+                <hr class="my-4 mx-auto" />
+                <div class="small text-black-50">
+                  Stay close—new music, new visuals.
+                </div>
+                <div class="d-flex justify-content-center gap-3 mt-2">
+                  <a
+                    class="text-decoration-none"
+                    href="https://www.youtube.com/embed/oELUIO3nIO8?rel=0&modestbranding=1&color=white"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="YouTube"
+                  >
+                    <i class="fa-brands fa-youtube"></i>
+                  </a>
+                  <a
+                    class="text-decoration-none"
+                    href="https://open.spotify.com/"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Spotify"
+                  >
+                    <i class="fa-brands fa-spotify"></i>
+                  </a>
+                  <a
+                    class="text-decoration-none"
+                    href="https://music.apple.com/us/album/free-yo-mind-feat-teshi-single/1816430419/"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Apple Music"
+                  >
+                    <i class="fa-brands fa-apple"></i>
+                  </a>
+                  <a
+                    class="text-decoration-none"
+                    href="https://www.instagram.com/therawwremedi?utm_source=ig_web_button_share_sheet&igsh=ZDNlZDc0MzIxNw==/"
+                    target="_blank"
+                    rel="noopener"
+                    aria-label="Instagram"
+                  >
+                    <i class="fa-brands fa-instagram"></i>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-4 mb-3 mb-md-0">
+            <div class="card py-4 h-100 action-card">
+              <div class="card-body text-center">
+                <i class="fa-solid fa-envelope text-primary mb-2"></i>
+                <h4 class="text-uppercase m-0">Contact</h4>
+                <hr class="my-4 mx-auto" />
+                <div class="small text-black-50">Bookings & press:</div>
+                <div class="small">
+                  <a href="#"
+                    >Remediraps@gmail.com</a
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="social d-flex justify-content-center">
+          <a
+            class="mx-2"
+            href="https://twitter.com/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Twitter"
+            ><i class="fab fa-twitter"></i
+          ></a>
+          <a
+            class="mx-2"
+            href="https://instagram.com/"
+            target="_blank"
+            rel="noopener"
+            aria-label="Instagram"
+            ><i class="fab fa-instagram"></i
+          ></a>
+          <a
+            class="mx-2"
+            href="https://www.youtube.com/"
+            target="_blank"
+            rel="noopener"
+            aria-label="YouTube"
+            ><i class="fab fa-youtube"></i
+          ></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer bg-black small text-center text-white-50">
+      <div class="container px-4 px-lg-5">
+        © <span id="rc-year"></span> Remedi’s Closet
+      </div>
+    </footer>
+
+    <!-- Bootstrap core JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Core theme JS -->
+    <script src="js/scripts.js"></script>
+
+    <!-- Navbar scroll behavior -->
+    <script>
+      const navbar = document.querySelector(".rc-nav");
+      window.addEventListener("scroll", () => {
+        if (window.scrollY > 50) {
+          navbar.classList.add("scrolled");
+        } else {
+          navbar.classList.remove("scrolled");
         }
-        TARGET.innerHTML = items.map(row).join('');
-      } catch (e) {
-        console.error(e);
-        TARGET.innerHTML = `<div class="text-center text-muted py-5">Couldn’t reach the bunker API.</div>`;
-      }
-    }
-    load();
-  })();
-</script>
+      });
+      document.getElementById("rc-year").textContent =
+        new Date().getFullYear();
+    </script>
 
-<style>
-  /* ===== bunker vibe ===== */
-  .feature-media {
-    position: relative;
-    border-radius: .6rem;
-    overflow: hidden;
-    min-height: 520px;
-    box-shadow: 0 12px 24px rgba(0,0,0,.10);
-    background: #0f1113;
-  }
-  .feature-media__img {
-    position: absolute; inset: 0;
-    background-size: cover; background-position: center;
-    transform: scale(1.02);
-    transition: transform .35s ease;
-  }
-  .feature-media:hover .feature-media__img {
-    transform: scale(1.06);
-  }
-  .media-overlay {
-    position: absolute; inset: 0;
-    background: radial-gradient(80% 80% at 50% 50%, rgba(0,0,0,0) 0%, rgba(0,0,0,.22) 100%);
-    pointer-events: none;
-  }
+    <!-- Dynamic products from your API -->
+    <script>
+      (function () {
+        const API_BASE = "https://remedis-api.vercel.app";
+        const TARGET = document.getElementById("featured-products");
+        const money = new Intl.NumberFormat("en-US", {
+          style: "currency",
+          currency: "USD",
+        });
+        const esc = (s) =>
+          String(s || "").replace(/[&<>\"']/g, (m) => {
+            return {
+              "&": "&amp;",
+              "<": "&lt;",
+              ">": "&gt;",
+              '"': "&quot;",
+              "'": "&#39;",
+            }[m];
+          });
 
-  /* corner ribbon on image */
-  .ribbon {
-    position: absolute;
-    top: 14px; left: -10px;
-    background: #e03131; color: #fff;
-    font-size: .73rem; letter-spacing: .04em;
-    font-weight: 700; text-transform: uppercase;
-    padding: .35rem .6rem;
-    transform: rotate(-6deg);
-    box-shadow: 0 6px 18px rgba(224,49,49,.25);
-    border-radius: .25rem;
-  }
-  .ribbon--drop { background:#0ea5e9; box-shadow:0 6px 18px rgba(14,165,233,.25); }
+        const ribbonText = (badge) => {
+          const b = String(badge || "").toLowerCase();
+          if (!b) return "";
+          if (b.includes("limited")) return "Limited";
+          if (b.includes("drop") || b.includes("pre")) return "Drop";
+          return badge;
+        };
 
-  /* panes */
-  .feature-pane {
-    border-radius: .6rem;
-    padding: 1.75rem;
-    border: 1px solid rgba(0,0,0,.06);
-  }
-  .pane--light {
-    background: #fff;
-    border-color: rgba(0,0,0,.06);
-  }
-  .pane--dark {
-    background: #0f1113;
-    color: #e9ecef;
-    border-color: rgba(255,255,255,.08);
-    box-shadow: inset 0 1px 0 rgba(255,255,255,.02);
-  }
+        function row(p, i) {
+          const alt = i % 2 === 1; // layout swap
+          const darkPane = i % 2 === 1;
+          const img = esc(p.image || "assets/img/bg-masthead.jpg");
+          const name = esc(p.name);
+          const desc = esc(p.desc || "");
+          const cat = esc(p.category || "");
+          const stock = esc(p.stock || "");
+          const badge = ribbonText(p.badge || "");
+          const price = money.format(Number(p.price || 0));
+          const sku = esc(p.sku || "");
 
-  /* typography + meta */
-  .bunker-title { letter-spacing:.2px; }
-  .bunker-meta { font-size: .975rem; }
+          const media = `
+            <div class="${alt ? "col-lg-6 order-lg-2" : "col-lg-7"} mb-3 mb-lg-0">
+              <div class="feature-media hover-pop">
+                <div class="feature-media__img" style="background-image:url('${img}')"></div>
+                ${badge ? `<div class="ribbon ribbon--${badge.toLowerCase()}">${badge}</div>` : ""}
+                <div class="media-overlay"></div>
+              </div>
+            </div>`;
 
-  /* badges next to title */
-  .tag {
-    display:inline-block; line-height:1;
-    font-size:.70rem; font-weight:700; text-transform:uppercase;
-    padding:.35rem .5rem; border-radius:.35rem;
-    border:1px solid transparent;
-  }
-  .tag--limited { background:#ffe3e3; color:#9b2226; border-color:#ffc9c9; }
-  .tag--drop    { background:#c7eefc; color:#0b5568; border-color:#aee8fb; }
-
-  /* interaction polish */
-  .hover-pop {
-    transition: transform .22s ease, box-shadow .22s ease, filter .22s ease;
-    will-change: transform, box-shadow, filter;
-  }
-  .hover-pop:hover {
-    transform: translateY(-4px) scale(1.015);
-    box-shadow: 0 16px 40px rgba(0,0,0,.14);
-    filter: saturate(1.03);
-  }
-
-  /* button */
-  .btn-keycard {
-    background:#101826; color:#fff; border:none;
-    padding:.65rem .95rem; border-radius:.45rem;
-    letter-spacing:.02em;
-    transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
-  }
-  .btn-keycard:hover {
-    transform: translateY(-1px);
-    background:#0b1220;
-    box-shadow:0 10px 24px rgba(0,0,0,.22);
-    color:#fff;
-  }
-
-  /* motion respect */
-  @media (prefers-reduced-motion: reduce) {
-    .hover-pop, .feature-media__img { transition:none !important; }
-  }
-</style>
-
-
-
-        <!-- Signup-->
-        <section class="signup-section" id="signup">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-md-10 col-lg-8 mx-auto text-center">
-                        <i class="far fa-paper-plane fa-2x mb-2 text-white"></i>
-                        <h2 class="text-white mb-5">Subscribe to receive updates!</h2>
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- * * SB Forms Contact Form * *-->
-                        <!-- * * * * * * * * * * * * * * *-->
-                        <!-- This form is pre-integrated with SB Forms.-->
-                        <!-- To make this form functional, sign up at-->
-                        <!-- https://startbootstrap.com/solution/contact-forms-->
-                        <!-- to get an API token!-->
-                        <form class="form-signup" id="contactForm" data-sb-form-api-token="API_TOKEN">
-                            <!-- Email address input-->
-                            <div class="row input-group-newsletter">
-                                <div class="col"><input class="form-control" id="emailAddress" type="email" placeholder="Enter email address..." aria-label="Enter email address..." data-sb-validations="required,email" /></div>
-                                <div class="col-auto"><button class="btn btn-primary disabled" id="submitButton" type="submit">Notify Me!</button></div>
-                            </div>
-                            <div class="invalid-feedback mt-2" data-sb-feedback="emailAddress:required">An email is required.</div>
-                            <div class="invalid-feedback mt-2" data-sb-feedback="emailAddress:email">Email is not valid.</div>
-                            <!-- Submit success message-->
-                            <!---->
-                            <!-- This is what your users will see when the form-->
-                            <!-- has successfully submitted-->
-                            <div class="d-none" id="submitSuccessMessage">
-                                <div class="text-center mb-3 mt-2 text-white">
-                                    <div class="fw-bolder">Form submission successful!</div>
-                                    To activate this form, sign up at
-                                    <br />
-                                    <a href="https://startbootstrap.com/solution/contact-forms">https://startbootstrap.com/solution/contact-forms</a>
-                                </div>
-                            </div>
-                            <!-- Submit error message-->
-                            <!---->
-                            <!-- This is what your users will see when there is-->
-                            <!-- an error submitting the form-->
-                            <div class="d-none" id="submitErrorMessage"><div class="text-center text-danger mb-3 mt-2">Error sending message!</div></div>
-                        </form>
-                    </div>
+          const pane = `
+            <div class="${alt ? "col-lg-6 order-lg-1 pe-lg-4" : "col-lg-5 ps-lg-4"}">
+              <div class="feature-pane ${darkPane ? "pane--dark text-center text-lg-end" : "pane--light"} hover-pop d-flex flex-column justify-content-center h-100">
+                <h4 class="mb-2 bunker-title">${name}${
+                  badge
+                    ? ` <span class="tag tag--${badge.toLowerCase()} align-middle ms-1">${badge}</span>`
+                    : ""
+                }</h4>
+                ${
+                  desc
+                    ? `<p class="${
+                        darkPane ? "text-white-50" : "text-muted"
+                      } mb-3 clamp-2">${desc}</p>`
+                    : ""
+                }
+                <div class="mb-3 bunker-meta">
+                  <strong>${price}</strong>
+                  <span class="${darkPane ? "text-white-50" : "text-muted"}">
+                    ${cat ? ` • ${cat}` : ""}${stock ? ` • ${stock}` : ""}
+                  </span>
                 </div>
-            </div>
-        </section>
-        <!-- Contact-->
-        <section class="contact-section bg-black">
-            <div class="container px-4 px-lg-5">
-                <div class="row gx-4 gx-lg-5">
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-map-marked-alt text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Address</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50">4923 Market Street, Orlando FL</div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-envelope text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Email</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50"><a href="#!">hello@yourdomain.com</a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-3 mb-md-0">
-                        <div class="card py-4 h-100">
-                            <div class="card-body text-center">
-                                <i class="fas fa-mobile-alt text-primary mb-2"></i>
-                                <h4 class="text-uppercase m-0">Phone</h4>
-                                <hr class="my-4 mx-auto" />
-                                <div class="small text-black-50">+1 (555) 902-8832</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="social d-flex justify-content-center">
-                    <a class="mx-2" href="#!"><i class="fab fa-twitter"></i></a>
-                    <a class="mx-2" href="#!"><i class="fab fa-facebook-f"></i></a>
-                    <a class="mx-2" href="#!"><i class="fab fa-github"></i></a>
-                </div>
-            </div>
-        </section>
-<script>
-  const navbar = document.querySelector('.rc-nav');
-  window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-      navbar.classList.add('scrolled');
-    } else {
-      navbar.classList.remove('scrolled');
-    }
-  });
-</script>
+                <a class="btn btn-sm btn-keycard" href="shop.html?sku=${sku}">View in Shop</a>
+              </div>
+            </div>`;
 
+          return `<div class="row gx-0 ${
+            i === 0 ? "mb-4 mb-lg-5" : "mb-4"
+          } align-items-stretch">
+            ${media + pane}
+          </div>`;
+        }
 
-        <!-- Footer-->
-        <footer class="footer bg-black small text-center text-white-50"><div class="container px-4 px-lg-5">Copyright &copy; Your Website 2023</div></footer>
-        <!-- Bootstrap core JS-->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-        <!-- Core theme JS-->
-        <script src="js/scripts.js"></script>
-        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <!-- * *                               SB Forms JS                               * *-->
-        <!-- * * Activate your form at https://startbootstrap.com/solution/contact-forms * *-->
-        <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *-->
-        <script src="https://cdn.startbootstrap.com/sb-forms-latest.js"></script>
-    </body>
+        async function load() {
+          try {
+            const r = await fetch(`${API_BASE}/api/catalog`, {
+              credentials: "omit",
+            });
+            const data = await r.json();
+            const items = Array.isArray(data.products) ? data.products : [];
+            if (!items.length) {
+              TARGET.innerHTML = `<div class="text-center text-muted py-5">Products on the way…</div>`;
+              return;
+            }
+            TARGET.innerHTML = items.map(row).join("");
+          } catch (e) {
+            console.error(e);
+            TARGET.innerHTML = `<div class="text-center text-muted py-5">Couldn’t reach the catalog.</div>`;
+          }
+        }
+        load();
+      })();
+    </script>
+  </body>
 </html>

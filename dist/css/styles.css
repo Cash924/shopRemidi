@@ -11300,3 +11300,184 @@ body {
   background-color: rgba(20, 20, 20, 0.9);
   backdrop-filter: blur(12px);
 }
+/* ---------------- ABOUT BANNER (shirt image) ---------------- */
+:root{
+  /* easy knobs to nudge where the image is "centered" */
+  --about-focal-x: 72%;   /* move 0% ← left … 100% → right */
+  --about-focal-y: 22%;   /* move 0% ↑ top  … 100% ↓ bottom */
+}
+
+section.about-section#about{
+  position: relative;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #fff;
+  padding: 5rem 1rem;
+
+  /* Your image + no banding blends */
+  background:
+    url("../assets/img/remedi-hero.jpg") no-repeat var(--about-focal-x) var(--about-focal-y) / cover;
+  background-attachment: fixed; /* subtle parallax on desktop */
+  overflow: hidden;
+}
+
+/* Left-to-right soft black so text sits on dark area */
+section.about-section#about::before{
+  content:"";
+  position:absolute; inset:0;
+  background: linear-gradient(90deg,
+    rgba(0,0,0,.92) 0%,
+    rgba(0,0,0,.78) 28%,
+    rgba(0,0,0,.45) 58%,
+    rgba(0,0,0,.15) 78%,
+    rgba(0,0,0,0) 100%);
+  pointer-events:none;
+}
+
+/* Bottom vignette to blend into the next section */
+section.about-section#about::after{
+  content:"";
+  position:absolute; left:0; right:0; bottom:0; height:120px;
+  background: linear-gradient(to top, rgba(0,0,0,.55), rgba(0,0,0,0));
+  pointer-events:none;
+}
+
+/* Text polish */
+section.about-section#about h2,
+section.about-section#about p{
+  position:relative; z-index:1;
+  text-shadow: 0 2px 8px rgba(0,0,0,.55);
+}
+
+/* Mobile: crop a touch more to keep the print in frame */
+@media (max-width: 992px){
+  :root{ --about-focal-x: 68%; --about-focal-y: 28%; }
+  section.about-section#about{ min-height: 58vh; background-attachment: scroll; }
+}
+@media (max-width: 576px){
+  :root{ --about-focal-x: 64%; --about-focal-y: 32%; }
+  section.about-section#about{ min-height: 50vh; }
+}
+/* ---------------- PRODUCT PREVIEW PANES ---------------- */
+.feature-pane{
+  border-radius: .6rem;
+  padding: 1.5rem 1.6rem;
+  /* very subtle top divider, not a new “shape” */
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.045);
+}
+
+.pane--dark{
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.035);
+}
+
+/* Title gets air; description sits a tad lower */
+.feature-pane .bunker-title{
+  margin-bottom: .4rem;       /* was .2rem-ish */
+  line-height: 1.15;
+}
+
+.feature-pane p{
+  margin-top: .25rem;
+  margin-bottom: 1rem;        /* give space before price row */
+  line-height: 1.5;
+}
+
+/* Price/meta row: calmer spacing, nicer rhythm */
+.feature-pane .bunker-meta{
+  margin-bottom: 1rem;        /* keeps button from crowding it */
+  font-size: .95rem;
+  opacity: .95;
+}
+
+/* Button: keep it tidy under the text block */
+.feature-pane .btn-keycard{
+  padding: .55rem .9rem;
+}
+
+/* Image tiles on the left: ensure slight zoom & crisp crop */
+.feature-media{
+  min-height: 460px;          /* a bit shorter on landing for balance */
+}
+@media (max-width: 992px){
+  .feature-media{ min-height: 360px; }
+}
+/* Card stack rhythm */
+.projects-section .row + .row{ margin-top: .75rem; }
+
+/* Media tile: same rounding as pane + a touch more lift on hover */
+.feature-media{
+  border-radius: .6rem;
+  box-shadow: 0 10px 28px rgba(0,0,0,.10);
+}
+.feature-media:hover{
+  box-shadow: 0 16px 40px rgba(0,0,0,.14);
+}
+
+/* Pane: air between title, blurb, and price; calm text sizes */
+.feature-pane{
+  padding: 1.6rem 1.7rem 1.4rem;
+  box-shadow: inset 0 1px 0 rgba(0,0,0,.045); /* hairline only */
+}
+.pane--dark{ box-shadow: inset 0 1px 0 rgba(255,255,255,.04); }
+
+.feature-pane .bunker-title{
+  margin-bottom: .42rem;       /* breathing room above the blurb */
+  line-height: 1.14;
+  letter-spacing: .2px;
+}
+
+.feature-pane p{
+  margin-top: .25rem;
+  margin-bottom: 1.05rem;      /* space before price row */
+  line-height: 1.55;
+}
+
+/* Price/meta row spacing + tone */
+.feature-pane .bunker-meta{
+  margin-bottom: 1rem;
+  font-size: .96rem;
+  opacity: .92;
+}
+
+/* Button: compact & aligned */
+.feature-pane .btn-keycard{
+  padding: .55rem .9rem;
+  font-weight: 600;
+}
+
+/* Subtle, classy hover for the text pane (no new shapes) */
+.feature-pane.hover-pop{
+  transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+}
+.feature-pane.hover-pop:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 14px 36px rgba(0,0,0,.12);
+  filter: saturate(1.02);
+}
+
+/* Slightly shorter media height on landing so panes don't feel crowded */
+.feature-media{ min-height: 440px; }
+@media (max-width: 992px){ .feature-media{ min-height: 360px; } }
+/* Visually conceal text in inputs/fields during submit */
+.conceal{
+  color: transparent !important;
+  text-shadow: none !important;
+  caret-color: transparent !important;
+}
+.conceal::placeholder{ color: transparent !important; }
+
+/* Visually hide entered text while submitting, without clearing values */
+.conceal{
+  color: transparent !important;
+  text-shadow: none !important;
+  caret-color: transparent !important;
+}
+.conceal::placeholder{ color: transparent !important; }
+
+/* Dim cards + lock UI during submit */
+.submitting .summary-card,
+.submitting .form-card{ opacity:.66; pointer-events:none; }
