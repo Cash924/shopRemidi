@@ -459,6 +459,45 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Core theme JS -->
     <script src="js/scripts.js"></script>
+<!-- Live cart badge hookup -->
+<script src="js/cart.js"></script>
+<script>
+  (function () {
+    const BADGE_ID = 'cartCount';
+    const LS_KEY = 'rc_cart_v1';
+
+    function getCart() {
+      try {
+        if (window.Cart && typeof Cart.load === 'function') return Cart.load();
+        return JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+      } catch { return []; }
+    }
+
+    function countItems(arr) {
+      return (Array.isArray(arr) ? arr : []).reduce((n, i) => n + (Number(i.qty) || 0), 0);
+    }
+
+    function updateBadge() {
+      const el = document.getElementById(BADGE_ID);
+      if (!el) return;
+      el.textContent = countItems(getCart());
+    }
+
+    // initial
+    updateBadge();
+
+    // updates from other tabs/windows
+    window.addEventListener('storage', (e) => {
+      if (e.key === LS_KEY) updateBadge();
+    });
+
+    // best-effort local updates (if your Cart.js dispatches a custom event)
+    document.addEventListener('rc:cart-changed', updateBadge);
+
+    // ultra-safe fallback: light heartbeat
+    setInterval(updateBadge, 1500);
+  })();
+</script>
 
     <!-- Navbar scroll behavior -->
     <script>
