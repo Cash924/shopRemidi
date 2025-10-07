@@ -1,9 +1,57 @@
-<!-- /dist/success.html -->
-<!doctype html>
-<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Payment Success</title>
-<body style="font-family:system-ui;padding:24px">
-  <h1>Thanks! 🎉</h1>
-  <p>Your payment was received. You’ll get an email confirmation from Stripe.</p>
-  <p><a href="shop.html">Back to shop</a></p>
-</body></html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Order Successful — Remedi’s Closet</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="css/styles.css" rel="stylesheet" />
+  <style>
+    body{background:#0b0d10;color:#e9ecef}
+    .banner{background:#0f5132;border:1px solid #0f5132;border-radius:12px;color:#d1fae5;padding:14px 16px}
+    .banner .title{font-weight:800;letter-spacing:.02em}
+    .shell{max-width:900px;margin:96px auto 40px;padding:0 16px}
+    .cardish{background:#101826;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:24px}
+    a.btn-dark{background:#101826;border-color:#1b2433}
+  </style>
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark fixed-top">
+    <div class="container"><a class="navbar-brand" href="index.html">REMEDI’S CLOSET</a></div>
+  </nav>
+
+  <main class="shell">
+    <div class="banner mb-3">
+      <div class="title">Payment successful</div>
+      <div>Your order is confirmed. A receipt was sent to your email.</div>
+    </div>
+
+    <section class="cardish">
+      <h1 class="h4 fw-bold mb-2">Thank you.</h1>
+      <p class="text-white-50 mb-3">
+        Session: <span id="sid" class="text-white"></span>
+      </p>
+      <div class="d-flex gap-2">
+        <a href="shop.html" class="btn btn-light">Continue shopping</a>
+        <a href="index.html" class="btn btn-dark">Back to entrance</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="text-center text-white-50 small py-4">© <span id="y"></span> Remedi’s Closet</footer>
+
+  <script src="js/cart.js"></script>
+  <script>
+    // Clear local cart
+    try {
+      localStorage.removeItem('rc_cart_v1');
+      document.dispatchEvent(new Event('rc:cart-changed'));
+    } catch {}
+    // Show session id tail
+    const q = new URLSearchParams(location.search);
+    const sid = q.get('session_id') || '';
+    document.getElementById('sid').textContent = sid ? '…' + sid.slice(-8) : '(not available)';
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
