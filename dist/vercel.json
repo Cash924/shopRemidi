@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "builds": [{ "src": "dist/**", "use": "@vercel/static" }],
+  "routes": [
+    { "src": "^/$", "dest": "/dist/index.html" },
+    { "src": "^/success.html$", "dest": "/dist/success.html" },
+    { "src": "^/cancel.html$", "dest": "/dist/cancel.html" },
+    { "src": "^(.*)$", "dest": "/dist$1" }
+  ]
+}
