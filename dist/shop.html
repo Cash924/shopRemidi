@@ -252,17 +252,26 @@
       const prod = PRODUCTS.find(p => String(p.sku) === sku);
       if (!prod) return;
 
-      if (window.Cart?.add) {
-        Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
-      } else {
-        // localStorage fallback
-        const k = 'rc_cart_v1';
-        const cart = JSON.parse(localStorage.getItem(k) || '[]');
-        const i = cart.findIndex(x => x.sku === prod.sku);
-        if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1; else cart.push({ sku: prod.sku, qty: 1 });
-        localStorage.setItem(k, JSON.stringify(cart));
-        document.dispatchEvent(new CustomEvent('rc:cart-changed'));
-      }
+<!-- in shop.html, inside the click handler after Cart.add(...) -->
+if (window.Cart?.add) {
+  Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
+  // ✅ make the badge update immediately
+  window.Cart?.syncBadge?.();
+} else {
+  // fallback stores to localStorage (you already have this part)
+  const k = 'rc_cart_v1';
+  const cart = JSON.parse(localStorage.getItem(k) || '[]');
+  const i = cart.findIndex(x => x.sku === prod.sku);
+  if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1; else cart.push({ sku: prod.sku, qty: 1 });
+  localStorage.setItem(k, JSON.stringify(cart));
+  document.dispatchEvent(new CustomEvent('rc:cart-changed'));
+
+  // ✅ update the badge in fallback too
+  const count = cart.reduce((s, it) => s + (it.qty || 1), 0);
+  const badge = document.getElementById('cartCount');
+  if (badge) badge.textContent = String(count);
+}
+
 
       btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
       setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
