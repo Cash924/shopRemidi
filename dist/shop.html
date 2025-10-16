@@ -89,6 +89,19 @@
     .checkout-cta:active{transform:translateY(0);box-shadow:0 12px 28px rgba(0,0,0,.22)}
     .checkout-cta i{margin-right:.5rem}
     footer{color:var(--muted);border-top:1px solid var(--line)}
+
+    /* === Inventory badge (bright translucent red) === */
+    .inv-badge{
+      position:absolute;top:.6rem;right:.6rem;
+      min-width:2.6rem;padding:.28rem .58rem;border-radius:.55rem;
+      background: rgba(255, 56, 56, .28);      /* translucent bright red */
+      border: 1px solid rgba(255, 56, 56, .6);
+      color:#fff;font-weight:900;font-size:.85rem;text-align:center;letter-spacing:.02em;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
+      text-shadow: 0 1px 0 rgba(0,0,0,.25);
+      line-height:1;
+    }
   </style>
 </head>
 <body id="shop-page">
@@ -159,6 +172,7 @@
         </form>
       </div>
 
+      <!-- Products -->
       <section aria-labelledby="productsHeading">
         <h2 id="productsHeading" class="visually-hidden">Products</h2>
         <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center" id="productsGrid"></div>
@@ -169,6 +183,7 @@
     </div>
   </main>
 
+  <!-- FOOTER -->
   <footer class="py-4">
     <div class="container text-center small">
       ACCESS LOG • <span class="text-muted">Remedi’s Closet</span> • <span id="year"></span>
@@ -180,6 +195,9 @@
   <script src="js/cart.js"></script>
 
   <script>
+    // ---- Local inventory overlay (hat = 1 left, tee = 11 left) ----
+    const INVENTORY = { 'RC-HAT-001': 1, 'RC-TEE-001': 11 };
+
     const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
     let PRODUCTS = [];
 
@@ -187,14 +205,21 @@
       .then(r => r.json())
       .then(data => {
         PRODUCTS = data?.products || [];
+
+        // Optional image fallbacks + attach inventory counts from map
         for (const p of PRODUCTS) {
           if (!p.image) {
             if (p.sku === 'RC-HAT-001')  p.image = 'assets/img/ipad.jpg';
             if (p.sku === 'RC-TEE-001')  p.image = 'assets/img/onPerson2.JPG';
           }
+          if (Object.prototype.hasOwnProperty.call(INVENTORY, p.sku)) {
+            p.inventory = INVENTORY[p.sku];
+          }
         }
+
         renderProducts(PRODUCTS);
 
+        // Duo mode if <= 2 products
         if (PRODUCTS.length <= 2) {
           document.body.classList.add('duo');
           document.getElementById('filtersBar')?.classList.add('d-none');
@@ -213,10 +238,15 @@
       const price = formatUSD(p.price);
       const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
       const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
+      const inv   = (typeof p.inventory === 'number')
+        ? `<span class="inv-badge">${p.inventory} left</span>`
+        : '';
+
       return `
         <div class="col">
           <article class="product-card glass-hover" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
             <div class="product-thumb">
+              ${inv}
               <img src="${esc(p.image)}" alt="${esc(p.alt || p.name)}" loading="lazy"
                    onerror="this.closest('.product-thumb').classList.add('is-missing')">
             </div>
@@ -244,7 +274,7 @@
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    // Safe add-to-cart with Cart fallback (prevents runtime error if cart.js is missing)
+    // Add-to-cart with immediate badge update + localStorage fallback
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('button.btn-ghost[data-sku]');
       if (!btn) return;
@@ -252,26 +282,21 @@
       const prod = PRODUCTS.find(p => String(p.sku) === sku);
       if (!prod) return;
 
-<!-- in shop.html, inside the click handler after Cart.add(...) -->
-if (window.Cart?.add) {
-  Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
-  // ✅ make the badge update immediately
-  window.Cart?.syncBadge?.();
-} else {
-  // fallback stores to localStorage (you already have this part)
-  const k = 'rc_cart_v1';
-  const cart = JSON.parse(localStorage.getItem(k) || '[]');
-  const i = cart.findIndex(x => x.sku === prod.sku);
-  if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1; else cart.push({ sku: prod.sku, qty: 1 });
-  localStorage.setItem(k, JSON.stringify(cart));
-  document.dispatchEvent(new CustomEvent('rc:cart-changed'));
-
-  // ✅ update the badge in fallback too
-  const count = cart.reduce((s, it) => s + (it.qty || 1), 0);
-  const badge = document.getElementById('cartCount');
-  if (badge) badge.textContent = String(count);
-}
-
+      if (window.Cart?.add) {
+        Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
+        // update the nav badge immediately
+        window.Cart?.syncBadge?.();
+      } else {
+        const k = 'rc_cart_v1';
+        const cart = JSON.parse(localStorage.getItem(k) || '[]');
+        const i = cart.findIndex(x => x.sku === prod.sku);
+        if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1; else cart.push({ sku: prod.sku, qty: 1 });
+        localStorage.setItem(k, JSON.stringify(cart));
+        document.dispatchEvent(new CustomEvent('rc:cart-changed'));
+        const count = cart.reduce((s, it) => s + (it.qty || 1), 0);
+        const badge = document.getElementById('cartCount');
+        if (badge) badge.textContent = String(count);
+      }
 
       btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
       setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
