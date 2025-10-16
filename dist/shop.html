@@ -58,7 +58,7 @@
     .product-thumb{position:relative;aspect-ratio:1/1;background:#11151a;border-bottom:1px solid var(--line);overflow:hidden}
     .product-thumb img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.03);transition:transform .3s ease,filter .3s ease}
     .product-card:hover .product-thumb img{transform:scale(1.06);filter:saturate(1.05) contrast(1.05)}
-    .product-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0) 55%);pointer-events:none}
+    .product-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0) 55%);pointer-events:none; z-index:1;}
     .product-thumb.is-missing{display:grid;place-items:center;color:var(--muted);border:1px dashed var(--line)}
 
     .product-glass{position:absolute;left:0;right:0;bottom:0;display:grid;gap:.45rem;padding:.9rem .95rem;color:var(--text);
@@ -101,6 +101,7 @@
       box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
       text-shadow: 0 1px 0 rgba(0,0,0,.25);
       line-height:1;
+      z-index:2; /* make sure it sits above the gradient overlay */
     }
   </style>
 </head>
@@ -196,7 +197,9 @@
 
   <script>
     // ---- Local inventory overlay (hat = 1 left, tee = 11 left) ----
+    // Keep keys normalized (UPPERCASE, no spaces)
     const INVENTORY = { 'RC-HAT-001': 1, 'RC-TEE-001': 11 };
+    const normSku = s => String(s || '').toUpperCase().replace(/\s+/g,'').trim();
 
     const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
     let PRODUCTS = [];
@@ -208,13 +211,13 @@
 
         // Optional image fallbacks + attach inventory counts from map
         for (const p of PRODUCTS) {
+          const ns = normSku(p.sku);
           if (!p.image) {
-            if (p.sku === 'RC-HAT-001')  p.image = 'assets/img/ipad.jpg';
-            if (p.sku === 'RC-TEE-001')  p.image = 'assets/img/onPerson2.JPG';
+            if (ns === 'RC-HAT-001')  p.image = 'assets/img/ipad.jpg';
+            if (ns === 'RC-TEE-001')  p.image = 'assets/img/onPerson2.JPG';
           }
-          if (Object.prototype.hasOwnProperty.call(INVENTORY, p.sku)) {
-            p.inventory = INVENTORY[p.sku];
-          }
+          const inv = INVENTORY[ns];
+          if (typeof inv === 'number') p.inventory = inv;
         }
 
         renderProducts(PRODUCTS);
