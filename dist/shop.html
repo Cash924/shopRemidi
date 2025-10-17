@@ -5,7 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Remedi’s Closet — Shop</title>
   <meta name="description" content="Remedi’s Closet — exclusive, bunker-coded drops. Limited access." />
+
+  <!-- Serve from /dist so assets/js resolve -->
   <base href="./">
+
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
   <!-- Fonts -->
@@ -87,7 +90,7 @@
     .checkout-cta i{margin-right:.5rem}
     footer{color:var(--muted);border-top:1px solid var(--line)}
 
-    /* Inventory badge (tee only) */
+    /* === Inventory badge (bright translucent red) — only used on TEE === */
     .inv-badge{
       position:absolute;top:.6rem;right:.6rem;
       min-width:2.6rem;padding:.28rem .58rem;border-radius:.55rem;
@@ -97,7 +100,8 @@
       backdrop-filter: blur(6px);
       box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
       text-shadow: 0 1px 0 rgba(0,0,0,.25);
-      line-height:1; z-index:2;
+      line-height:1;
+      z-index:2;
     }
   </style>
 </head>
@@ -192,8 +196,11 @@
   <script src="js/cart.js"></script>
 
   <script>
-    // Only the tee shows an inventory badge (1 left). Hat gets no badge.
-    const normSku = s => String(s || '').toUpperCase().trim().replace(/\s+/g,'');
+    // ---- Only show inventory on the Tee (1 left). Hat gets NO badge. ----
+    // Robust: try SKU first; if that fails, fall back to name contains "tee".
+    const TEE_SKUS = new Set(['RC-TEE-001','RCTEE001','RC_TEE_001']); // add any variants you use
+    const ONE_LEFT = 1;
+    const norm = s => String(s||'').toUpperCase().replace(/\s+/g,'').trim();
 
     const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
     let PRODUCTS = [];
@@ -204,25 +211,26 @@
         PRODUCTS = data?.products || [];
 
         for (const p of PRODUCTS) {
-          const ns = normSku(p.sku);
-
-          // Tee badge only
-          if (ns.startsWith('RC-TEE-001')) {
-            p.inventory = 1; // show "1 left"
-          } else {
-            delete p.inventory; // ensure others (like hat) have no badge
+          // fallback images
+          const skuN = norm(p.sku);
+          if (!p.image) {
+            if (skuN.includes('HAT')) p.image = 'assets/img/ipad.jpg';
+            if (skuN.includes('TEE')) p.image = 'assets/img/onPerson2.JPG';
           }
 
-          // Image fallbacks
-          if (!p.image) {
-            if (ns.startsWith('RC-HAT-001')) p.image = 'assets/img/ipad.jpg';
-            if (ns.startsWith('RC-TEE-001')) p.image = 'assets/img/onPerson2.JPG';
+          // only tee gets a badge
+          const isTeeBySku  = TEE_SKUS.has(skuN);
+          const isTeeByName = /tee\b/i.test(String(p.name||''));
+          if (isTeeBySku || isTeeByName) {
+            p.inventory = ONE_LEFT;
+          } else {
+            delete p.inventory; // ensure hat has no badge
           }
         }
 
         renderProducts(PRODUCTS);
 
-        // Duo layout if only two products
+        // Duo layout if there are only two products
         if (PRODUCTS.length <= 2) {
           document.body.classList.add('duo');
           document.getElementById('filtersBar')?.classList.add('d-none');
@@ -241,9 +249,7 @@
       const price = formatUSD(p.price);
       const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
       const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
-      const inv   = (typeof p.inventory === 'number')
-        ? `<span class="inv-badge">${p.inventory} left</span>`
-        : '';
+      const inv   = (typeof p.inventory === 'number') ? `<span class="inv-badge">${p.inventory} left</span>` : '';
 
       return `
         <div class="col">
