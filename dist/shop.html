@@ -101,7 +101,7 @@
       box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
       text-shadow: 0 1px 0 rgba(0,0,0,.25);
       line-height:1;
-      z-index:2; /* make sure it sits above the gradient overlay */
+      z-index:2; /* above the gradient overlay */
     }
   </style>
 </head>
@@ -196,9 +196,9 @@
   <script src="js/cart.js"></script>
 
   <script>
-    // ---- Local inventory overlay (hat = 1 left, tee = 11 left) ----
+    // ---- Local inventory overlay (TEE = 1 left, HAT = 11 left) ----
     // Keep keys normalized (UPPERCASE, no spaces)
-    const INVENTORY = { 'RC-HAT-001': 1, 'RC-TEE-001': 11 };
+    const INVENTORY = { 'RC-HAT-001': 11, 'RC-TEE-001': 1 };
     const normSku = s => String(s || '').toUpperCase().replace(/\s+/g,'').trim();
 
     const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
