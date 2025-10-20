@@ -55,6 +55,7 @@
     #promoHelp.success{color:#198754}
     #promoHelp.error{color:#b02a37}
     .btn-ghost.applied{background:#19875410;border-color:#198754;color:#198754}
+    .hide{display:none!important}
   </style>
 </head>
 <body>
@@ -101,10 +102,10 @@
       <div id="promoHelp" class="form-text"></div>
 
       <div class="d-flex gap-2 align-items-center mb-2">
-        <label class="small text-muted me-2" for="shipMethod">Shipping</label>
-        <select id="shipMethod" class="form-select" style="max-width:220px">
-          <option value="standard">Standard — Free</option>
-          <option value="rush">Rush — $10.00</option>
+        <label class="small text-muted me-2" for="shipMethod">Delivery</label>
+        <select id="shipMethod" class="form-select" style="max-width:280px">
+          <option value="ship">Ship to me — $5.00</option>
+          <option value="meet">Local Exchange — $0.00</option>
         </select>
       </div>
 
@@ -137,9 +138,9 @@
       <div class="mb-3">
         <div class="d-flex align-items-center justify-content-between">
           <span class="section-label mb-0">Shipping address</span>
-          <a href="#manual" class="small text-muted text-decoration-underline">Enter address manually</a>
+          <span class="small text-muted" id="addrHint">Enter address (hidden for Local Exchange)</span>
         </div>
-        <div class="row g-2">
+        <div id="addressBlock" class="row g-2">
           <div class="col-12"><input id="fullName" class="form-control" placeholder="Full name" autocomplete="name" required></div>
           <div class="col-12 col-md-6">
             <select id="country" class="form-select" autocomplete="country">
@@ -173,7 +174,7 @@
 <script src="js/cart.js"></script>
 <script>
   const API_URL = 'https://remedis-api.vercel.app/api/checkoutRedirect';
-  const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';   // used to enrich fallback items
+  const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
 
   // ------- Cart preview -------
   let CART = (window.Cart?.load ? Cart.load() : []);
@@ -184,19 +185,19 @@
     discount: discount, shipping: shipping, tax: tax, total: grandTotal,
     promo: promoInput, applyPromo: applyPromo, shipMethod: shipMethod,
     email: email, fullName: fullName, address: address, city: city, state: state, zip: zip, country: country,
-    payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay')
+    payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay'),
+    addressBlock: document.getElementById('addressBlock')
   };
 
   // If cart.js wasn't used (fallback path), pull from localStorage and enrich by SKU
   async function ensureCartHasDetails() {
-    if (CART && CART.length && CART[0].name) return; // already detailed
+    if (CART && CART.length && CART[0].name) return;
     if (!window.Cart?.load) {
       const k = 'rc_cart_v1';
       try {
         const raw = JSON.parse(localStorage.getItem(k) || '[]');
         if (!raw.length) { CART = []; return; }
 
-        // fetch catalog to fill name/price/image by sku
         const res = await fetch(CATALOG_API, { credentials: 'omit' });
         const data = await res.json().catch(()=>null);
         const catalog = (data && data.products) ? data.products : [];
@@ -315,9 +316,10 @@
   applyPromo.addEventListener('click', applyCode);
   promoInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); applyCode(); } });
 
-  // Totals (no local discount for FREEYOMIND)
+  // Totals
   function discountAmount(sub){ return 0; }
-  function calcShipping(){ return (els.shipMethod.value==='rush') ? 10 : 0; }
+  function calcShipping(){ return (els.shipMethod.value === 'ship') ? 5 : 0; }
+  shipMethod.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
 
   function recalc(){
     const sub = calcSubtotal();
@@ -331,6 +333,19 @@
     els.shipping.textContent = fmtUSD(ship);
     els.tax.textContent = fmtUSD(taxAmt);
     els.total.textContent = fmtUSD(total);
+  }
+
+  // Show/hide address for Local Exchange
+  const addrInputs = [fullName, address, city, state, zip, country];
+  function toggleAddress(){
+    const meet = (els.shipMethod.value === 'meet');
+    els.addressBlock.classList.toggle('hide', meet);
+    addrInputs.forEach(input => {
+      if (!input) return;
+      if (meet) { input.dataset.wasRequired = input.required ? '1' : ''; input.required = false; }
+      else { if (input.dataset.wasRequired === '1') input.required = true; }
+    });
+    document.getElementById('addrHint').textContent = meet ? 'Address not needed for Local Exchange' : 'Enter address';
   }
 
   // ---------- CART CONTROLS ----------
@@ -353,10 +368,10 @@
     Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc();
   });
 
-  // initial load: ensure details -> render -> totals -> sync badge
+  // initial load: ensure details -> render -> totals -> toggleAddr -> sync badge
   (async () => {
     await ensureCartHasDetails();
-    renderItems(); recalc(); Cart?.syncBadge?.();
+    renderItems(); toggleAddress(); recalc(); Cart?.syncBadge?.();
   })();
 
   // ------- Stripe Checkout redirect -------
@@ -364,15 +379,15 @@
     if (!CART.length){ alert('Your cart is empty.'); return; }
 
     const payload = {
-      email: els.email.value.trim(),
+      email: email.value.trim(),
       full_name: fullName.value.trim(),
       address: address.value.trim(),
       city: city.value.trim(),
       state: state.value.trim(),
       zip: zip.value.trim(),
       country: country.value,
-      ship_method: shipMethod.value,
-      promo_code: coupon?.code || '',
+      ship_method: shipMethod.value,          // 'ship' or 'meet'
+      promo_code: (document.getElementById('promoInput').value || '').trim(),
       cart: CART.map(i => ({
         sku: i.sku,
         qty: i.qty,
