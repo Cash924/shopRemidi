@@ -11,14 +11,30 @@ const Cart = (() => {
     if (el) el.textContent = String(count());
   };
 
+  // item can include { variant: { id, name, label } }
   const add = (item, qty = 1) => {
     const cart = load();
-    const i = cart.findIndex(x => x.sku === item.sku);
-    if (i > -1) cart[i].qty += qty;
-    else cart.push({ sku:item.sku, name:item.name, price:Number(item.price||0), image:item.image||'', qty:Number(qty)||1 });
+    const keyOf = (v) => JSON.stringify(v || null);
+    const vKey = keyOf(item.variant);
+
+    // merge if same SKU + same variant (so "Black" hat and "Rose Gold" hat can be separate lines)
+    const i = cart.findIndex(x => x.sku === item.sku && keyOf(x.variant) === vKey);
+    if (i > -1) {
+      cart[i].qty += qty;
+    } else {
+      cart.push({
+        sku: item.sku,
+        name: item.name,
+        price: Number(item.price || 0),
+        image: item.image || '',
+        qty: Number(qty) || 1,
+        variant: item.variant || null
+      });
+    }
     save(cart); syncBadge(); return cart;
   };
 
+  // kept for compatibility (targets first match by SKU)
   const updateQty = (sku, qty) => {
     const cart = load();
     const i = cart.findIndex(x => x.sku === sku);

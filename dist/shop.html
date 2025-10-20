@@ -5,10 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Remedi’s Closet — Shop</title>
   <meta name="description" content="Remedi’s Closet — exclusive, bunker-coded drops. Limited access." />
-
-  <!-- Serve from /dist so assets/js resolve -->
   <base href="./">
-
   <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
   <!-- Fonts -->
@@ -103,6 +100,22 @@
       line-height:1;
       z-index:2;
     }
+
+    /* ===== Variant selector pills (from the test page) ===== */
+    .variant-group{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.2rem}
+    .variant-label{font-size:.82rem;color:var(--muted);margin-top:.25rem}
+    .option-pill{
+      position:relative; display:inline-flex; align-items:center; justify-content:center;
+      padding:.35rem .6rem; border:1px solid #3a424b; background:#12161b; color:#e6e9ee;
+      border-radius:.55rem; font-weight:800; font-size:.82rem; letter-spacing:.02em;
+      cursor:pointer; user-select:none; transition:transform .08s ease, box-shadow .12s ease, border-color .12s ease;
+    }
+    .option-pill:hover{box-shadow:0 6px 16px rgba(0,0,0,.30)}
+    .option-pill[data-selected="true"]{border-color:var(--accent); box-shadow:0 0 0 2px rgba(214,44,44,.18) inset}
+    .option-pill.disabled{opacity:.42; filter:grayscale(1); cursor:not-allowed; border-style:dashed;}
+    .swatch{width:.75rem;height:.75rem;border-radius:999px;margin-right:.45rem;border:1px solid rgba(255,255,255,.25)}
+    .swatch.rose{background:linear-gradient(180deg,#f8c7b8,#e6a79a)}
+    .swatch.black{background:#111}
   </style>
 </head>
 <body id="shop-page">
@@ -197,8 +210,7 @@
 
   <script>
     // ---- Only show inventory on the Tee (1 left). Hat gets NO badge. ----
-    // Robust: try SKU first; if that fails, fall back to name contains "tee".
-    const TEE_SKUS = new Set(['RC-TEE-001','RCTEE001','RC_TEE_001']); // add any variants you use
+    const TEE_SKUS = new Set(['RC-TEE-001','RCTEE001','RC_TEE_001']);
     const ONE_LEFT = 1;
     const norm = s => String(s||'').toUpperCase().replace(/\s+/g,'').trim();
 
@@ -211,26 +223,47 @@
         PRODUCTS = data?.products || [];
 
         for (const p of PRODUCTS) {
-          // fallback images
           const skuN = norm(p.sku);
+
+          // fallback images
           if (!p.image) {
             if (skuN.includes('HAT')) p.image = 'assets/img/ipad.jpg';
             if (skuN.includes('TEE')) p.image = 'assets/img/onPerson2.JPG';
           }
 
-          // only tee gets a badge
+          // inventory badge: only tee
           const isTeeBySku  = TEE_SKUS.has(skuN);
           const isTeeByName = /tee\b/i.test(String(p.name||''));
-          if (isTeeBySku || isTeeByName) {
-            p.inventory = ONE_LEFT;
-          } else {
-            delete p.inventory; // ensure hat has no badge
+          if (isTeeBySku || isTeeByName) p.inventory = ONE_LEFT; else delete p.inventory;
+
+          // === attach variants ===
+          if (skuN.includes('HAT')) {
+            p.variants = {
+              label: 'Color',
+              type: 'color',
+              options: [
+                { id:'rose-gold', label:'Rose Gold', swatch:'rose', disabled:false, selected:true },
+                { id:'black',     label:'Black',     swatch:'black', disabled:false, selected:false },
+              ]
+            };
+          }
+          if (skuN.includes('TEE')) {
+            p.variants = {
+              label: 'Size',
+              type: 'size',
+              options: [
+                { id:'xs', label:'XS', disabled:true },
+                { id:'s',  label:'S',  disabled:true },
+                { id:'m',  label:'M',  disabled:false, selected:true },
+                { id:'l',  label:'L',  disabled:true },
+                { id:'xl', label:'XL', disabled:true },
+              ]
+            };
           }
         }
 
         renderProducts(PRODUCTS);
 
-        // Duo layout if there are only two products
         if (PRODUCTS.length <= 2) {
           document.body.classList.add('duo');
           document.getElementById('filtersBar')?.classList.add('d-none');
@@ -253,7 +286,7 @@
 
       return `
         <div class="col">
-          <article class="product-card glass-hover" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
+          <article class="product-card glass-hover" data-sku="${esc(p.sku)}" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
             <div class="product-thumb">
               ${inv}
               <img src="${esc(p.image)}" alt="${esc(p.alt || p.name)}" loading="lazy"
@@ -267,12 +300,30 @@
                 ${badge}
               </div>
               ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
-              <button class="btn-ghost" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
+
+              ${variantBlock(p)}
+
+              <button class="btn-ghost mt-1" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
                 <i class="fas fa-key me-1"></i> Add to Cart
               </button>
             </div>
           </article>
         </div>
+      `;
+    }
+
+    function variantBlock(p){
+      if (!p.variants?.options?.length) return '';
+      const v = p.variants;
+      const pills = v.options.map(opt => {
+        const sel = opt.selected ? 'true' : 'false';
+        const dis = opt.disabled ? 'disabled' : '';
+        const dot = v.type === 'color' ? `<span class="swatch ${opt.swatch||''}"></span>` : '';
+        return `<span class="option-pill ${dis}" data-role="pill" data-sku="${esc(p.sku)}" data-id="${esc(opt.id)}" data-name="${esc(opt.label)}" data-selected="${sel}" aria-disabled="${dis? 'true':'false'}">${dot}${esc(opt.label)}</span>`;
+      }).join('');
+      return `
+        <div class="variant-label">${esc(v.label)}</div>
+        <div class="variant-group" role="group" aria-label="${esc(v.label)}">${pills}</div>
       `;
     }
 
@@ -283,22 +334,52 @@
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    // Add-to-cart with immediate badge update + localStorage fallback
+    // ===== Variant pill interactions =====
+    document.addEventListener('click', (e) => {
+      const pill = e.target.closest('.option-pill');
+      if (pill){
+        if (pill.classList.contains('disabled')) return;
+        // deselect siblings inside same variant group
+        pill.parentElement.querySelectorAll('.option-pill').forEach(el => el.dataset.selected = 'false');
+        pill.dataset.selected = 'true';
+        return;
+      }
+    });
+
+    // ===== Add-to-cart (with variant) + fallback =====
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('button.btn-ghost[data-sku]');
       if (!btn) return;
+
       const sku = btn.dataset.sku;
       const prod = PRODUCTS.find(p => String(p.sku) === sku);
       if (!prod) return;
 
+      // read selected variant (if any)
+      const card = btn.closest('.product-card');
+      let variant = null;
+      const selected = card?.querySelector('.option-pill[data-selected="true"]');
+      if (selected){
+        const vg = selected.closest('.variant-group');
+        const labelEl = vg?.previousElementSibling;
+        variant = {
+          label: labelEl ? labelEl.textContent.trim() : 'Option',
+          id: selected.dataset.id,
+          name: selected.dataset.name
+        };
+      }
+
       if (window.Cart?.add) {
-        Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image }, 1);
+        Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image, variant }, 1);
         window.Cart?.syncBadge?.();
       } else {
         const k = 'rc_cart_v1';
         const cart = JSON.parse(localStorage.getItem(k) || '[]');
-        const i = cart.findIndex(x => x.sku === prod.sku);
-        if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1; else cart.push({ sku: prod.sku, qty: 1 });
+        // key by sku + variantId (so sizes/colors are separate lines)
+        const key = JSON.stringify({ sku: prod.sku, variantId: variant?.id || null });
+        const i = cart.findIndex(x => JSON.stringify({ sku: x.sku, variantId: x.variant?.id || null }) === key);
+        if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1;
+        else cart.push({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image, variant, qty: 1 });
         localStorage.setItem(k, JSON.stringify(cart));
         document.dispatchEvent(new CustomEvent('rc:cart-changed'));
         const count = cart.reduce((s, it) => s + (it.qty || 1), 0);
@@ -306,7 +387,7 @@
         if (badge) badge.textContent = String(count);
       }
 
-      btn.innerHTML = '<i class="fas fa-unlock me-1"></i> Added';
+      btn.innerHTML = `<i class="fas fa-unlock me-1"></i> Added${variant ? ` (${variant.name})` : ''}`;
       setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
     });
 

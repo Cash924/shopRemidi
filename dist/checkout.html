@@ -178,6 +178,7 @@
   // ------- Cart preview -------
   let CART = (window.Cart?.load ? Cart.load() : []);
   const fmtUSD = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(n);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   const els = {
     items: orderItems, subtotal: subtotal, discountRow: discountRow, discountName: discountName,
     discount: discount, shipping: shipping, tax: tax, total: grandTotal,
@@ -193,7 +194,6 @@
       const k = 'rc_cart_v1';
       try {
         const raw = JSON.parse(localStorage.getItem(k) || '[]');
-        // raw may be [{sku, qty}] from fallback add-to-cart
         if (!raw.length) { CART = []; return; }
 
         // fetch catalog to fill name/price/image by sku
@@ -206,9 +206,10 @@
           return {
             sku: it.sku,
             qty: it.qty || 1,
-            name: p.name || it.sku,
-            price: Number(p.price || 0),
-            image: p.image || 'assets/img/ipad.jpg'
+            name: p.name || it.name || it.sku,
+            price: Number(p.price ?? it.price ?? 0),
+            image: p.image || it.image || 'assets/img/ipad.jpg',
+            variant: it.variant || null
           };
         });
       } catch { CART = []; }
@@ -235,11 +236,13 @@
     }
     els.items.innerHTML = CART.map((it,i)=>`
       <article class="item">
-        <img src="${it.image}" alt="${it.name}" loading="lazy">
+        <img src="${it.image}" alt="${esc(it.name)}" loading="lazy">
         <div>
-          <div class="item-name">${it.name}</div>
+          <div class="item-name">${esc(it.name)}
+            ${it.variant ? `<div class="small text-muted mt-1">${esc(it.variant.label)}: <strong>${esc(it.variant.name)}</strong></div>` : ``}
+          </div>
           <div class="text-muted small">${fmtUSD(it.price)}</div>
-          <div class="subrow">
+          <div class="subrow mt-1">
             <div class="qty-control" data-i="${i}">
               <button class="qty-btn" data-delta="-1" type="button" aria-label="Decrease">−</button>
               <input class="qty-input" type="number" min="0" value="${it.qty}" data-i="${i}" aria-label="Quantity">
@@ -370,7 +373,13 @@
       country: country.value,
       ship_method: shipMethod.value,
       promo_code: coupon?.code || '',
-      cart: CART.map(i => ({ sku:i.sku, qty:i.qty }))
+      cart: CART.map(i => ({
+        sku: i.sku,
+        qty: i.qty,
+        variant_id: i.variant?.id || null,
+        variant_name: i.variant?.name || null,
+        variant_label: i.variant?.label || null
+      }))
     };
     if (!payload.email){ alert('Please enter your email.'); return; }
 
