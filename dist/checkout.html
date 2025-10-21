@@ -56,6 +56,13 @@
     #promoHelp.error{color:#b02a37}
     .btn-ghost.applied{background:#19875410;border-color:#198754;color:#198754}
     .hide{display:none!important}
+
+    /* Delivery toggle */
+    .delivery-wrap{border:1px solid var(--line);border-radius:12px;background:#fff;padding:.6rem}
+    .btn-delivery{font-weight:800}
+    .btn-delivery.active{background:#eaf6ec;border-color:#198754;color:#0f5132}
+    .btn-delivery.ship{background:#fff}
+    .helper{font-size:.85rem}
   </style>
 </head>
 <body>
@@ -101,12 +108,21 @@
       </div>
       <div id="promoHelp" class="form-text"></div>
 
-      <div class="d-flex gap-2 align-items-center mb-2">
-        <label class="small text-muted me-2" for="shipMethod">Delivery</label>
-        <select id="shipMethod" class="form-select" style="max-width:280px">
-          <option value="ship">Ship to me — $5.00</option>
-          <option value="meet">Local Exchange — $0.00</option>
-        </select>
+      <!-- Delivery choice (Local Exchange default, Shipping $8) -->
+      <div class="mb-2">
+        <span class="small text-muted d-block mb-1">Delivery</span>
+        <div class="delivery-wrap">
+          <div class="btn-group w-100" role="group" aria-label="Delivery method">
+            <input class="btn-check" type="radio" name="delivery" id="deliverMeet" value="meet" checked>
+            <label class="btn btn-outline-success btn-delivery flex-grow-1" for="deliverMeet">Local Exchange — $0.00</label>
+
+            <input class="btn-check" type="radio" name="delivery" id="deliverShip" value="ship">
+            <label class="btn btn-outline-secondary btn-delivery ship flex-grow-1" for="deliverShip">Ship to me — $8.00</label>
+          </div>
+          <div id="deliveryHelp" class="helper mt-2 text-success">
+            Preferred: Local Exchange — we’ll email you to coordinate a meet-up for pickup.
+          </div>
+        </div>
       </div>
 
       <div class="totals mt-2">
@@ -138,9 +154,9 @@
       <div class="mb-3">
         <div class="d-flex align-items-center justify-content-between">
           <span class="section-label mb-0">Shipping address</span>
-          <span class="small text-muted" id="addrHint">Enter address (hidden for Local Exchange)</span>
+          <span class="small text-muted" id="addrHint">Address not needed for Local Exchange</span>
         </div>
-        <div id="addressBlock" class="row g-2">
+        <div id="addressBlock" class="row g-2 hide">
           <div class="col-12"><input id="fullName" class="form-control" placeholder="Full name" autocomplete="name" required></div>
           <div class="col-12 col-md-6">
             <select id="country" class="form-select" autocomplete="country">
@@ -183,11 +199,14 @@
   const els = {
     items: orderItems, subtotal: subtotal, discountRow: discountRow, discountName: discountName,
     discount: discount, shipping: shipping, tax: tax, total: grandTotal,
-    promo: promoInput, applyPromo: applyPromo, shipMethod: shipMethod,
+    promo: promoInput, applyPromo: applyPromo,
     email: email, fullName: fullName, address: address, city: city, state: state, zip: zip, country: country,
     payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay'),
-    addressBlock: document.getElementById('addressBlock')
+    addressBlock: document.getElementById('addressBlock'),
+    deliveryRadios: () => document.querySelectorAll('input[name="delivery"]')
   };
+
+  const DELIVERY_HELP = document.getElementById('deliveryHelp');
 
   // If cart.js wasn't used (fallback path), pull from localStorage and enrich by SKU
   async function ensureCartHasDetails() {
@@ -222,7 +241,7 @@
   function concealSensitive(on){
     document.body.classList.toggle('submitting', on);
     sensitiveFields.forEach(el => el && el.classList.toggle('conceal', on));
-    [promoInput, applyPromo, shipMethod, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link')]
+    [promoInput, applyPromo, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link'), ...els.deliveryRadios()]
       .forEach(el => el && (el.disabled = on));
     if (els.appleBtn) els.appleBtn.style.visibility = on ? 'hidden' : '';
     const help = document.getElementById('promoHelp'); if (help) help.textContent = '';
@@ -257,8 +276,8 @@
   }
   function calcSubtotal(){ return CART.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty||0),0) }
   function estTax(taxable){
-    const us = (els.country.value||'').includes('United States');
-    const zipOk = (els.zip.value||'').trim().length >= 5;
+    const us = (country.value||'').includes('United States');
+    const zipOk = (zip.value||'').trim().length >= 5;
     return (us && zipOk) ? taxable * 0.08 : 0;
   }
 
@@ -270,7 +289,7 @@
 
   function normCode(raw){
     return String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g,'').trim();
-  }
+    }
 
   async function verifyPromo(raw){
     const code = normCode(raw);
@@ -316,11 +335,28 @@
   applyPromo.addEventListener('click', applyCode);
   promoInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); applyCode(); } });
 
+  // Delivery helpers
+  const addrInputs = [fullName, address, city, state, zip, country];
+  function currentDelivery(){
+    const checked = document.querySelector('input[name="delivery"]:checked');
+    return checked ? checked.value : 'meet';
+  }
+  function calcShipping(){ return (currentDelivery() === 'ship') ? 8 : 0; }
+  function toggleAddress(){
+    const meet = (currentDelivery() === 'meet');
+    addressBlock.classList.toggle('hide', meet);
+    addrInputs.forEach(input => {
+      if (!input) return;
+      if (meet) { input.dataset.wasRequired = input.required ? '1' : ''; input.required = false; }
+      else { if (input.dataset.wasRequired === '1') input.required = true; }
+    });
+    document.getElementById('addrHint').textContent = meet ? 'Address not needed for Local Exchange' : 'Enter address';
+    DELIVERY_HELP.classList.toggle('text-success', meet);
+    DELIVERY_HELP.classList.toggle('text-muted', !meet);
+  }
+
   // Totals
   function discountAmount(sub){ return 0; }
-  function calcShipping(){ return (els.shipMethod.value === 'ship') ? 5 : 0; }
-  shipMethod.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
-
   function recalc(){
     const sub = calcSubtotal();
     const disc = discountAmount(sub);
@@ -328,25 +364,24 @@
     const taxable = Math.max(0, sub - disc);
     const taxAmt = estTax(taxable);
     const total = Math.max(0, taxable + ship + taxAmt);
-    els.subtotal.textContent = fmtUSD(sub);
-    els.discountRow.classList.add('d-none');
-    els.shipping.textContent = fmtUSD(ship);
-    els.tax.textContent = fmtUSD(taxAmt);
-    els.total.textContent = fmtUSD(total);
+    subtotal.textContent = fmtUSD(sub);
+    discountRow.classList.add('d-none');
+    shipping.textContent = fmtUSD(ship);
+    tax.textContent = fmtUSD(taxAmt);
+    grandTotal.textContent = fmtUSD(total);
+
+    // update visual state of delivery buttons
+    document.querySelectorAll('.btn-delivery').forEach(lbl=>{
+      const input = document.getElementById(lbl.getAttribute('for'));
+      if (!input) return;
+      lbl.classList.toggle('active', input.checked);
+    });
   }
 
-  // Show/hide address for Local Exchange
-  const addrInputs = [fullName, address, city, state, zip, country];
-  function toggleAddress(){
-    const meet = (els.shipMethod.value === 'meet');
-    els.addressBlock.classList.toggle('hide', meet);
-    addrInputs.forEach(input => {
-      if (!input) return;
-      if (meet) { input.dataset.wasRequired = input.required ? '1' : ''; input.required = false; }
-      else { if (input.dataset.wasRequired === '1') input.required = true; }
-    });
-    document.getElementById('addrHint').textContent = meet ? 'Address not needed for Local Exchange' : 'Enter address';
-  }
+  // Bind delivery change
+  document.querySelectorAll('input[name="delivery"]').forEach(r=>{
+    r.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
+  });
 
   // ---------- CART CONTROLS ----------
   orderItems.addEventListener('click', (e)=>{
@@ -368,7 +403,7 @@
     Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc();
   });
 
-  // initial load: ensure details -> render -> totals -> toggleAddr -> sync badge
+  // initial load
   (async () => {
     await ensureCartHasDetails();
     renderItems(); toggleAddress(); recalc(); Cart?.syncBadge?.();
@@ -379,14 +414,14 @@
     if (!CART.length){ alert('Your cart is empty.'); return; }
 
     const payload = {
-      email: email.value.trim(),
+      email: email.value.trim(),             // <-- backend: set customer_email to this
       full_name: fullName.value.trim(),
       address: address.value.trim(),
       city: city.value.trim(),
       state: state.value.trim(),
       zip: zip.value.trim(),
       country: country.value,
-      ship_method: shipMethod.value,          // 'ship' or 'meet'
+      ship_method: currentDelivery(),        // 'ship' or 'meet'
       promo_code: (document.getElementById('promoInput').value || '').trim(),
       cart: CART.map(i => ({
         sku: i.sku,
