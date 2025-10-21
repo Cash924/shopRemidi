@@ -119,18 +119,37 @@
 
     /* Pretty native dropdown (keeps accessibility but matches panels) */
     .select-pretty{position:relative}
-    .select-pretty select{
-      appearance:auto; -webkit-appearance:auto; -moz-appearance:auto;
-      background:var(--pill);
-      border:1px solid #e3dedb;
-      color:#222;                         /* fixes “null/white” text issues */
-      border-radius:12px;
-      padding:.65rem .9rem;
-      width:100%;
-      font-weight:800;
-      letter-spacing:.02em;
-      text-transform:uppercase;
-    }
+      .select-pretty select {
+        appearance:auto;
+        -webkit-appearance:auto;
+        -moz-appearance:auto;
+        width:100%;
+        background:var(--pill);
+        border:1px solid #ddd6d1;
+        color:#2a2a2a;
+        border-radius:10px;
+        padding:.6rem .9rem;
+        font-weight:600;            /* Softer weight */
+        text-transform:none;        /* No yelling */
+        letter-spacing:.01em;
+        font-size:.95rem;           /* Matches form fields */
+        transition:all .2s ease;
+      }
+
+      .select-pretty select:hover {
+        border-color:#cfc7c2;
+      }
+
+      .select-pretty select:focus {
+        border-color:#d8cbc1;
+        box-shadow:0 0 0 3px rgba(197,180,167,.25); /* Soft warm glow */
+        outline:none;
+      }
+
+      .select-pretty option {
+        color:#2a2a2a;
+        background:#fff;
+      }
     .select-pretty select:focus{border-color:#d7cbbd;box-shadow:0 0 0 3px var(--ring)}
     .select-pretty option{color:#222;background:#fff} /* ensures options list is readable */
 
