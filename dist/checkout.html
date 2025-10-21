@@ -16,53 +16,99 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="css/styles.css" rel="stylesheet" />
   <style>
-    :root{--bg-0:#181b1f;--panel:#fff;--summary:#f6f2ef;--ink:#222;--muted:#6c757d;--line:#ebe5e2;--accent:#d62c2c;--pill:#f6f3f1}
+    :root{
+      --bg-0:#181b1f;--panel:#fff;--summary:#f6f2ef;--ink:#e8ecf2;--muted:#9aa3ad;--line:#2a2f35;--accent:#d62c2c;--pill:#12161b;
+      --glass:rgba(18,20,24,.6);--stroke:rgba(255,255,255,.08);--blur:12px;
+    }
     html,body{height:100%}
-    body{background:radial-gradient(1200px 600px at 50% -10%,#23272c 0%,var(--bg-0) 55%) fixed;color:var(--ink);font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Varela Round",sans-serif;letter-spacing:.01em}
+    body{
+      background:radial-gradient(1200px 600px at 50% -10%,#23272c 0%,var(--bg-0) 55%) fixed;
+      color:var(--ink);
+      font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Varela Round",sans-serif;
+      letter-spacing:.01em
+    }
     .navbar{background:rgba(24,27,31,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
     .navbar .nav-link{color:#cfd4da!important}.navbar .nav-link:hover{color:#fff!important}
     .navbar-brand{color:#fff!important;letter-spacing:.08em;text-transform:uppercase;font-weight:800}
-    .hero-slim{min-height:28vh;display:grid;place-items:center;text-align:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.6)),url('assets/img/bg-masthead.jpg') center/cover no-repeat}
+    .hero-slim{min-height:28vh;display:grid;place-items:center;text-align:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.6)),url('assets/img/bg-masthead.jpg') center/cover no-repeat}
     .hero-slim h1{letter-spacing:.18em;text-transform:uppercase;margin:0}
+
     .checkout-shell{max-width:1120px;margin-inline:auto;padding:clamp(16px,2.5vw,28px)}
     .checkout-grid{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:1.05fr .95fr}
     @media (max-width:992px){.checkout-grid{grid-template-columns:1fr}}
-    .summary-card,.form-card{border:1px solid var(--line);border-radius:16px;padding:clamp(14px,2.2vw,22px);box-shadow:0 10px 24px rgba(0,0,0,.08);background:var(--panel)}
-    .summary-card{background:var(--summary)} .card-title{font-weight:800;letter-spacing:.02em}
-    .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .55rem;border-radius:999px;border:1px solid #e1dbd7;background:#fff;color:#222;font-size:.72rem;font-weight:800;text-transform:uppercase}
-    .chip .dot{width:.42rem;height:.42rem;border-radius:50%;background:#bbb;display:inline-block}
-    .section-label{display:block;font-size:.8rem;font-weight:800;letter-spacing:.06em;color:#6b7280;text-transform:uppercase;margin:.25rem 0 .35rem}
-    .form-control,.form-select{background:var(--pill);border:1px solid #e3dedb;border-radius:12px;padding:.65rem .85rem}
-    .form-control:focus,.form-select:focus{border-color:#bdb6b3;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+
+    .summary-card,.form-card{border:1px solid #2d333a;border-radius:16px;padding:clamp(14px,2.2vw,22px);
+      background:rgba(18,20,24,.55);backdrop-filter:blur(10px);color:#e6e9ee;box-shadow:0 10px 28px rgba(0,0,0,.28)}
+    .summary-card .card-title,.form-card .card-title{font-weight:800;letter-spacing:.02em}
+
+    .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .55rem;border-radius:999px;border:1px solid var(--stroke);
+      background:rgba(255,255,255,.06);color:#cfd6df;font-size:.72rem;font-weight:800;text-transform:uppercase}
+    .chip .dot{width:.42rem;height:.42rem;border-radius:50%;background:#7f8791;display:inline-block}
+
+    .section-label{display:block;font-size:.8rem;font-weight:800;letter-spacing:.06em;color:#9aa3ad;text-transform:uppercase;margin:.25rem 0 .35rem}
+
+    /* Inputs in dark glass */
+    .form-control,.form-select{
+      background:var(--pill);
+      border:1px solid #3a4149;
+      color:#e6e9ee;
+      border-radius:12px;padding:.65rem .85rem
+    }
+    .form-control::placeholder{color:#8d96a0}
+    .form-control:focus,.form-select:focus{border-color:#5d6874;box-shadow:0 0 0 3px rgba(255,255,255,.05)}
+
     .btn-ghost{border:1px solid var(--accent);color:var(--accent);background:rgba(214,44,44,.06);border-radius:999px;font-weight:800}
     .btn-ghost:hover{background:var(--accent);color:#fff}
-    .totals .row{padding:.25rem 0}.totals .grand{border-top:1px dashed #e0dad7;margin-top:.35rem;padding-top:.6rem}
-    .foot-note{color:#adb5bd}
+
+    .totals .row{padding:.25rem 0}.totals .grand{border-top:1px dashed #3a4149;margin-top:.35rem;padding-top:.6rem}
+    .foot-note{color:#9aa3ad}
+
     #orderItems{display:grid;gap:12px;margin-top:.25rem}
-    .item{display:grid;grid-template-columns:84px 1fr auto;gap:14px;align-items:center;padding:12px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
-    .item img{width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid #eee7e3;background:#faf8f7}
-    .qty-control{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem;border:1px solid #e3dedb;border-radius:999px;background:#f6f3f1}
-    .qty-btn{width:28px;height:28px;border-radius:999px;border:0;background:#fff;cursor:pointer;font-weight:900;line-height:1}
-    .qty-input{width:44px;text-align:center;border:0;background:transparent;font-weight:700}
+    .item{display:grid;grid-template-columns:84px 1fr auto;gap:14px;align-items:center;padding:12px;
+      background:rgba(255,255,255,.03);border:1px solid #2d333a;border-radius:16px}
+    .item img{width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid #2a2f35;background:#0f1317}
+    .qty-control{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem;border:1px solid #3a4149;border-radius:999px;background:#0f1317}
+    .qty-btn{width:28px;height:28px;border-radius:999px;border:0;background:#1a1f25;color:#e6e9ee;cursor:pointer;font-weight:900;line-height:1}
+    .qty-input{width:44px;text-align:center;border:0;background:transparent;color:#e6e9ee;font-weight:700}
+
     .applepay-btn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;border-radius:12px;border:0;background:#000;color:#fff;font-weight:700;letter-spacing:.01em}
     .applepay-btn i{margin-right:.4rem}
+
     .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:9999}
     .overlay.show{display:flex}
     .spinner{width:40px;height:40px;border-radius:50%;border:4px solid #fff;border-top-color:transparent;animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .submitting .conceal{color:transparent !important;text-shadow:0 0 .5em rgba(0,0,0,.25);caret-color:transparent}
     #promoHelp{min-height:1.25rem}
-    #promoHelp.success{color:#198754}
-    #promoHelp.error{color:#b02a37}
-    .btn-ghost.applied{background:#19875410;border-color:#198754;color:#198754}
+    #promoHelp.success{color:#22c55e}
+    #promoHelp.error{color:#ff6b6b}
+    .btn-ghost.applied{background:#22c55e10;border-color:#22c55e;color:#22c55e}
     .hide{display:none!important}
 
-    /* Delivery toggle */
-    .delivery-wrap{border:1px solid var(--line);border-radius:12px;background:#fff;padding:.6rem}
-    .btn-delivery{font-weight:800}
-    .btn-delivery.active{background:#eaf6ec;border-color:#198754;color:#0f5132}
-    .btn-delivery.ship{background:#fff}
-    .helper{font-size:.85rem}
+    /* Sexy dropdown (glass) */
+    .select-glass{position:relative}
+    .select-glass select{
+      appearance:none;-webkit-appearance:none;-moz-appearance:none;
+      width:100%;
+      background:linear-gradient(180deg,rgba(255,255,255,.04),rgba(255,255,255,.02)), var(--glass);
+      border:1px solid var(--stroke);
+      color:#e6e9ee;
+      padding:.7rem 2.6rem .7rem 1rem;
+      border-radius:.8rem;
+      backdrop-filter:blur(var(--blur));
+      text-transform:uppercase;
+      font-weight:900;letter-spacing:.04em
+    }
+    .select-glass:after{
+      content:"\f107"; /* fa-chevron-down */
+      font-family:"Font Awesome 6 Free"; font-weight:900;
+      position:absolute; right:.75rem; top:50%; transform:translateY(-50%);
+      color:#cfd6df; pointer-events:none; opacity:.9
+    }
+    .helper{font-size:.85rem;color:#9aa3ad}
+
+    .badge-soft{display:inline-block;background:rgba(214,44,44,.15);color:#ffdada;border:1px solid rgba(214,44,44,.35);padding:.25rem .45rem;border-radius:.45rem;font-size:.75rem}
   </style>
 </head>
 <body>
@@ -108,20 +154,17 @@
       </div>
       <div id="promoHelp" class="form-text"></div>
 
-      <!-- Delivery choice (Local Exchange default, Shipping $8) -->
+      <!-- Delivery (sexy dropdown) -->
       <div class="mb-2">
-        <span class="small text-muted d-block mb-1">Delivery</span>
-        <div class="delivery-wrap">
-          <div class="btn-group w-100" role="group" aria-label="Delivery method">
-            <input class="btn-check" type="radio" name="delivery" id="deliverMeet" value="meet" checked>
-            <label class="btn btn-outline-success btn-delivery flex-grow-1" for="deliverMeet">Local Exchange — $0.00</label>
-
-            <input class="btn-check" type="radio" name="delivery" id="deliverShip" value="ship">
-            <label class="btn btn-outline-secondary btn-delivery ship flex-grow-1" for="deliverShip">Ship to me — $8.00</label>
-          </div>
-          <div id="deliveryHelp" class="helper mt-2 text-success">
-            Preferred: Local Exchange — we’ll email you to coordinate a meet-up for pickup.
-          </div>
+        <span class="section-label">Delivery</span>
+        <div class="select-glass">
+          <select id="shipMethod" aria-label="Choose delivery method">
+            <option value="meet" selected>Local Exchange — $0.00 (Preferred)</option>
+            <option value="ship">Ship to me — $8.00</option>
+          </select>
+        </div>
+        <div id="deliveryHelp" class="helper mt-2">
+          <span class="badge-soft me-1">Preferred</span> Local Exchange — we’ll email you to coordinate a meet-up for pickup.
         </div>
       </div>
 
@@ -203,7 +246,7 @@
     email: email, fullName: fullName, address: address, city: city, state: state, zip: zip, country: country,
     payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay'),
     addressBlock: document.getElementById('addressBlock'),
-    deliveryRadios: () => document.querySelectorAll('input[name="delivery"]')
+    shipMethod: document.getElementById('shipMethod')
   };
 
   const DELIVERY_HELP = document.getElementById('deliveryHelp');
@@ -241,7 +284,7 @@
   function concealSensitive(on){
     document.body.classList.toggle('submitting', on);
     sensitiveFields.forEach(el => el && el.classList.toggle('conceal', on));
-    [promoInput, applyPromo, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link'), ...els.deliveryRadios()]
+    [promoInput, applyPromo, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link'), els.shipMethod]
       .forEach(el => el && (el.disabled = on));
     if (els.appleBtn) els.appleBtn.style.visibility = on ? 'hidden' : '';
     const help = document.getElementById('promoHelp'); if (help) help.textContent = '';
@@ -289,7 +332,7 @@
 
   function normCode(raw){
     return String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g,'').trim();
-    }
+  }
 
   async function verifyPromo(raw){
     const code = normCode(raw);
@@ -335,24 +378,22 @@
   applyPromo.addEventListener('click', applyCode);
   promoInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); applyCode(); } });
 
-  // Delivery helpers
-  const addrInputs = [fullName, address, city, state, zip, country];
-  function currentDelivery(){
-    const checked = document.querySelector('input[name="delivery"]:checked');
-    return checked ? checked.value : 'meet';
-  }
+  // Delivery helpers (dropdown)
+  function currentDelivery(){ return els.shipMethod.value; }
   function calcShipping(){ return (currentDelivery() === 'ship') ? 8 : 0; }
   function toggleAddress(){
     const meet = (currentDelivery() === 'meet');
     addressBlock.classList.toggle('hide', meet);
-    addrInputs.forEach(input => {
+    const inputs = [fullName, address, city, state, zip, country];
+    inputs.forEach(input => {
       if (!input) return;
       if (meet) { input.dataset.wasRequired = input.required ? '1' : ''; input.required = false; }
       else { if (input.dataset.wasRequired === '1') input.required = true; }
     });
     document.getElementById('addrHint').textContent = meet ? 'Address not needed for Local Exchange' : 'Enter address';
-    DELIVERY_HELP.classList.toggle('text-success', meet);
-    DELIVERY_HELP.classList.toggle('text-muted', !meet);
+    DELIVERY_HELP.innerHTML = meet
+      ? '<span class="badge-soft me-1">Preferred</span> Local Exchange — we’ll email you to coordinate a meet-up for pickup.'
+      : 'Your order ships to the address below.';
   }
 
   // Totals
@@ -369,19 +410,10 @@
     shipping.textContent = fmtUSD(ship);
     tax.textContent = fmtUSD(taxAmt);
     grandTotal.textContent = fmtUSD(total);
-
-    // update visual state of delivery buttons
-    document.querySelectorAll('.btn-delivery').forEach(lbl=>{
-      const input = document.getElementById(lbl.getAttribute('for'));
-      if (!input) return;
-      lbl.classList.toggle('active', input.checked);
-    });
   }
 
   // Bind delivery change
-  document.querySelectorAll('input[name="delivery"]').forEach(r=>{
-    r.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
-  });
+  els.shipMethod.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
 
   // ---------- CART CONTROLS ----------
   orderItems.addEventListener('click', (e)=>{
@@ -414,7 +446,7 @@
     if (!CART.length){ alert('Your cart is empty.'); return; }
 
     const payload = {
-      email: email.value.trim(),             // <-- backend: set customer_email to this
+      email: email.value.trim(),             // backend will set `customer_email`
       full_name: fullName.value.trim(),
       address: address.value.trim(),
       city: city.value.trim(),
