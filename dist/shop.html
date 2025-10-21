@@ -101,7 +101,7 @@
       z-index:2;
     }
 
-    /* ===== Variant selector pills (from the test page) ===== */
+    /* ===== Variant selector pills ===== */
     .variant-group{display:flex;flex-wrap:wrap;gap:.4rem;margin-top:.2rem}
     .variant-label{font-size:.82rem;color:var(--muted);margin-top:.25rem}
     .option-pill{
@@ -116,6 +116,9 @@
     .swatch{width:.75rem;height:.75rem;border-radius:999px;margin-right:.45rem;border:1px solid rgba(255,255,255,.25)}
     .swatch.rose{background:linear-gradient(180deg,#f8c7b8,#e6a79a)}
     .swatch.black{background:#111}
+
+    /* TEMP: keep product details panel visible (remove if you want slide-up) */
+    .product-card .product-glass { transform: none !important; }
   </style>
 </head>
 <body id="shop-page">
@@ -209,7 +212,7 @@
   <script src="js/cart.js"></script>
 
   <script>
-    // ---- Only show inventory on the Tee (1 left). Hat gets NO badge. ----
+    // === Data + detection helpers ===
     const TEE_SKUS = new Set(['RC-TEE-001','RCTEE001','RC_TEE_001']);
     const ONE_LEFT = 1;
     const norm = s => String(s||'').toUpperCase().replace(/\s+/g,'').trim();
@@ -217,53 +220,58 @@
     const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
     let PRODUCTS = [];
 
+    // === Fetch catalog and decorate products ===
     fetch(CATALOG_API, { credentials: 'omit' })
       .then(r => r.json())
       .then(data => {
         PRODUCTS = data?.products || [];
 
-        for (const p of PRODUCTS) {
-          const skuN = norm(p.sku);
+        PRODUCTS.forEach(p => {
+          const sku = String(p.sku || '');
+          const name = String(p.name || '');
+          const skuN = norm(sku);
+          const nameN = norm(name);
 
-          // fallback images
+          // Fallback images
           if (!p.image) {
-            if (skuN.includes('HAT')) p.image = 'assets/img/ipad.jpg';
-            if (skuN.includes('TEE')) p.image = 'assets/img/onPerson2.JPG';
+            if (skuN.includes('HAT') || nameN.includes('HAT')) p.image = 'assets/img/ipad.jpg';
+            if (skuN.includes('TEE') || nameN.includes('TEE')) p.image = 'assets/img/onPerson2.JPG';
           }
 
-          // inventory badge: only tee
-          const isTeeBySku  = TEE_SKUS.has(skuN);
-          const isTeeByName = /tee\b/i.test(String(p.name||''));
-          if (isTeeBySku || isTeeByName) p.inventory = ONE_LEFT; else delete p.inventory;
+          // Inventory badge only for tee
+          const isTee = TEE_SKUS.has(skuN) || skuN.includes('TEE') || /\bTEE\b/i.test(name);
+          if (isTee) p.inventory = ONE_LEFT; else delete p.inventory;
 
-          // === attach variants ===
-          if (skuN.includes('HAT')) {
+          // Variants
+          const isHat = skuN.includes('HAT') || /\bHAT\b/i.test(name);
+          if (isHat) {
             p.variants = {
               label: 'Color',
               type: 'color',
               options: [
-                { id:'rose-gold', label:'Rose Gold', swatch:'rose', disabled:false, selected:true },
+                { id:'rose-gold', label:'Rose Gold', swatch:'rose',  disabled:false, selected:true },
                 { id:'black',     label:'Black',     swatch:'black', disabled:false, selected:false },
               ]
             };
           }
-          if (skuN.includes('TEE')) {
+          if (isTee) {
             p.variants = {
               label: 'Size',
               type: 'size',
               options: [
-                { id:'xs', label:'XS', disabled:true },
-                { id:'s',  label:'S',  disabled:true },
+                { id:'xs', label:'XS', disabled:true  },
+                { id:'s',  label:'S',  disabled:true  },
                 { id:'m',  label:'M',  disabled:false, selected:true },
-                { id:'l',  label:'L',  disabled:true },
-                { id:'xl', label:'XL', disabled:true },
+                { id:'l',  label:'L',  disabled:true  },
+                { id:'xl', label:'XL', disabled:true  },
               ]
             };
           }
-        }
+        });
 
         renderProducts(PRODUCTS);
 
+        // Duo polish if only 1–2 products
         if (PRODUCTS.length <= 2) {
           document.body.classList.add('duo');
           document.getElementById('filtersBar')?.classList.add('d-none');
@@ -273,6 +281,7 @@
       })
       .catch(err => console.error('Catalog fetch error:', err));
 
+    // === Renderers ===
     function renderProducts(items) {
       const grid = document.getElementById('productsGrid');
       grid.innerHTML = items.map(cardHTML).join('');
@@ -300,9 +309,7 @@
                 ${badge}
               </div>
               ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
-
               ${variantBlock(p)}
-
               <button class="btn-ghost mt-1" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
                 <i class="fas fa-key me-1"></i> Add to Cart
               </button>
@@ -327,6 +334,7 @@
       `;
     }
 
+    // === Utils ===
     function formatUSD(n){
       return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
     }
@@ -334,19 +342,17 @@
       return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     }
 
-    // ===== Variant pill interactions =====
+    // === Variant pill interactions ===
     document.addEventListener('click', (e) => {
       const pill = e.target.closest('.option-pill');
-      if (pill){
-        if (pill.classList.contains('disabled')) return;
-        // deselect siblings inside same variant group
-        pill.parentElement.querySelectorAll('.option-pill').forEach(el => el.dataset.selected = 'false');
-        pill.dataset.selected = 'true';
-        return;
-      }
+      if (!pill) return;
+      if (pill.classList.contains('disabled')) return;
+      const group = pill.parentElement;
+      group.querySelectorAll('.option-pill').forEach(el => el.dataset.selected = 'false');
+      pill.dataset.selected = 'true';
     });
 
-    // ===== Add-to-cart (with variant) + fallback =====
+    // === Add-to-cart (keeps window.Cart if present; else localStorage) ===
     document.addEventListener('click', (e) => {
       const btn = e.target.closest('button.btn-ghost[data-sku]');
       if (!btn) return;
@@ -375,7 +381,7 @@
       } else {
         const k = 'rc_cart_v1';
         const cart = JSON.parse(localStorage.getItem(k) || '[]');
-        // key by sku + variantId (so sizes/colors are separate lines)
+        // key by sku + variantId (sizes/colors become separate lines)
         const key = JSON.stringify({ sku: prod.sku, variantId: variant?.id || null });
         const i = cart.findIndex(x => JSON.stringify({ sku: x.sku, variantId: x.variant?.id || null }) === key);
         if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1;
@@ -391,10 +397,10 @@
       setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
     });
 
+    // === Misc ===
     document.getElementById('resetFilters')?.addEventListener('click', () => {
       document.getElementById('filtersForm').reset();
     });
-
     document.getElementById('year').textContent = new Date().getFullYear();
   </script>
 </body>
