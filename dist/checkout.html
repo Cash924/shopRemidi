@@ -3,408 +3,464 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Remedi’s Closet — Shop</title>
-  <meta name="description" content="Remedi’s Closet — exclusive, bunker-coded drops. Limited access." />
+  <title>Remedi’s Closet — Checkout</title>
+  <meta name="description" content="Secure checkout — Remedi’s Closet." />
   <base href="./">
-  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
 
-  <!-- Fonts -->
+  <link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css?family=Varela+Round&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css?family=Nunito:300,400,600,700,800,900&display=swap" rel="stylesheet">
-
-  <!-- Icons + Bootstrap -->
   <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous" defer></script>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
-
-  <!-- Site CSS -->
   <link href="css/styles.css" rel="stylesheet" />
-
   <style>
-    :root{
-      --show-nav: 1;
-      --bg-0:#0f1114; --bg-1:#161a1f; --panel:#1b2026; --card:#181c22;
-      --line:#2a3037; --text:#e6e9ee; --muted:#97a0aa; --accent:#d62c2c;
-      --glass-bg: rgba(18,20,24,.55); --glass-stroke: rgba(255,255,255,.06); --glass-blur: 12px;
-    }
-    html,body{height:100%;}
-    body{
-      background: radial-gradient(1200px 560px at 50% -10%, var(--bg-1) 0%, var(--bg-0) 55%) fixed;
-      color:var(--text);
-      font-family:"Nunito", system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Varela Round", sans-serif;
-      letter-spacing:.01em;
-    }
-    .navbar{display: calc(var(--show-nav) * 1) !important; background: rgba(15,17,20,.85); backdrop-filter: blur(8px); border-bottom:1px solid var(--line);}
-    .navbar-brand{letter-spacing:.08em;text-transform:uppercase;font-weight:800;color:var(--text)!important}
-    .nav-link{color:var(--muted)!important}
-    .nav-link:hover{color:var(--accent)!important}
-
-    .shop-hero{position:relative;min-height:42vh;display:grid;place-items:center;text-align:center;border-bottom:1px solid var(--line);
-      background:linear-gradient(180deg, rgba(0,0,0,.35), rgba(0,0,0,.72)), url('assets/img/bg-masthead.jpg') center/cover no-repeat;}
-    .shop-hero h1{text-transform:uppercase;letter-spacing:.18em;margin:0}
-    .shop-hero p{color:var(--muted);margin:.75rem 0 0}
-    main{padding-top:clamp(1rem,3vh,2rem)}
-    .filters-bar{background:var(--panel);border:1px solid var(--line);border-radius:.9rem;padding:1rem;box-shadow:0 14px 28px rgba(0,0,0,.25)}
-    .filters-bar .form-control,.filters-bar .form-select{background:#12161b;color:var(--text);border:1px solid #333a42}
-    .filters-bar .form-control::placeholder{color:#8a929c}
-
-    .product-card{position:relative;background:var(--card);border:1px solid var(--line);border-radius:1rem;height:100%;display:flex;flex-direction:column;
-      transition:transform .15s ease,border-color .15s ease,box-shadow .15s ease;overflow:hidden;box-shadow:0 12px 26px rgba(0,0,0,.35)}
-    .product-card:hover{transform:translateY(-2px);border-color:var(--accent);box-shadow:0 18px 34px rgba(0,0,0,.45),0 0 0 1px color-mix(in oklab,var(--accent),transparent 80%)}
-    .product-thumb{position:relative;aspect-ratio:1/1;background:#11151a;border-bottom:1px solid var(--line);overflow:hidden}
-    .product-thumb img{width:100%;height:100%;object-fit:cover;display:block;transform:scale(1.03);transition:transform .3s ease,filter .3s ease}
-    .product-card:hover .product-thumb img{transform:scale(1.06);filter:saturate(1.05) contrast(1.05)}
-    .product-thumb::after{content:"";position:absolute;inset:0;background:linear-gradient(to top, rgba(0,0,0,.35), rgba(0,0,0,0) 55%);pointer-events:none; z-index:1;}
-    .product-thumb.is-missing{display:grid;place-items:center;color:var(--muted);border:1px dashed var(--line)}
-
-    .product-glass{position:absolute;left:0;right:0;bottom:0;display:grid;gap:.45rem;padding:.9rem .95rem;color:var(--text);
-      background:linear-gradient(to top, rgba(0,0,0,.45), rgba(0,0,0,.08)),var(--glass-bg);border-top:1px solid var(--glass-stroke);
-      backdrop-filter:blur(var(--glass-blur));-webkit-backdrop-filter:blur(var(--glass-blur));
-      border-bottom-left-radius:1rem;border-bottom-right-radius:1rem;transform:translateY(100%);transition:transform .25s ease}
-    .product-card.glass-hover:hover .product-glass,.product-card.glass-hover:focus-within .product-glass{transform:translateY(0%)}
-    .product-title{font-weight:800;letter-spacing:.04em;margin:0;text-shadow:0 1px 0 rgba(0,0,0,.35)}
-    .product-meta{color:var(--muted);font-size:.92rem}
-    .product-desc{color:#c5cbd3;font-size:.9rem;margin:.25rem 0 0}
-    .price{font-weight:900}
-    .glass-row{display:flex;align-items:center;justify-content:space-between;gap:.75rem}
-    .btn-ghost{border:1px solid var(--accent);background:rgba(214,44,44,.06);color:var(--accent);border-radius:.6rem;padding:.5rem .7rem;font-weight:800;line-height:1}
+    :root{--bg-0:#181b1f;--panel:#fff;--summary:#f6f2ef;--ink:#222;--muted:#6c757d;--line:#ebe5e2;--accent:#d62c2c;--pill:#f6f3f1}
+    html,body{height:100%}
+    body{background:radial-gradient(1200px 600px at 50% -10%,#23272c 0%,var(--bg-0) 55%) fixed;color:var(--ink);font-family:"Nunito",system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial,"Varela Round",sans-serif;letter-spacing:.01em}
+    .navbar{background:rgba(24,27,31,.9);backdrop-filter:blur(8px);border-bottom:1px solid rgba(255,255,255,.08)}
+    .navbar .nav-link{color:#cfd4da!important}.navbar .nav-link:hover{color:#fff!important}
+    .navbar-brand{color:#fff!important;letter-spacing:.08em;text-transform:uppercase;font-weight:800}
+    .hero-slim{min-height:28vh;display:grid;place-items:center;text-align:center;color:#fff;border-bottom:1px solid rgba(255,255,255,.08);background:linear-gradient(180deg,rgba(0,0,0,.25),rgba(0,0,0,.6)),url('assets/img/bg-masthead.jpg') center/cover no-repeat}
+    .hero-slim h1{letter-spacing:.18em;text-transform:uppercase;margin:0}
+    .checkout-shell{max-width:1120px;margin-inline:auto;padding:clamp(16px,2.5vw,28px)}
+    .checkout-grid{display:grid;gap:clamp(16px,2vw,24px);grid-template-columns:1.05fr .95fr}
+    @media (max-width:992px){.checkout-grid{grid-template-columns:1fr}}
+    .summary-card,.form-card{border:1px solid var(--line);border-radius:16px;padding:clamp(14px,2.2vw,22px);box-shadow:0 10px 24px rgba(0,0,0,.08);background:var(--panel)}
+    .summary-card{background:var(--summary)} .card-title{font-weight:800;letter-spacing:.02em}
+    .chip{display:inline-flex;align-items:center;gap:.4rem;padding:.22rem .55rem;border-radius:999px;border:1px solid #e1dbd7;background:#fff;color:#222;font-size:.72rem;font-weight:800;text-transform:uppercase}
+    .chip .dot{width:.42rem;height:.42rem;border-radius:50%;background:#bbb;display:inline-block}
+    .section-label{display:block;font-size:.8rem;font-weight:800;letter-spacing:.06em;color:#6b7280;text-transform:uppercase;margin:.25rem 0 .35rem}
+    .form-control,.form-select{background:var(--pill);border:1px solid #e3dedb;border-radius:12px;padding:.65rem .85rem}
+    .form-control:focus,.form-select:focus{border-color:#bdb6b3;box-shadow:0 0 0 3px rgba(0,0,0,.05)}
+    .btn-ghost{border:1px solid var(--accent);color:var(--accent);background:rgba(214,44,44,.06);border-radius:999px;font-weight:800}
     .btn-ghost:hover{background:var(--accent);color:#fff}
-    .badge-soft{background:rgba(214,44,44,.15);color:var(--accent);border:1px solid rgba(214,44,44,.35);padding:.25rem .45rem;border-radius:.45rem;font-size:.75rem}
+    .totals .row{padding:.25rem 0}.totals .grand{border-top:1px dashed #e0dad7;margin-top:.35rem;padding-top:.6rem}
+    .foot-note{color:#adb5bd}
+    #orderItems{display:grid;gap:12px;margin-top:.25rem}
+    .item{display:grid;grid-template-columns:84px 1fr auto;gap:14px;align-items:center;padding:12px;background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.06)}
+    .item img{width:84px;height:84px;object-fit:cover;border-radius:12px;border:1px solid #eee7e3;background:#faf8f7}
+    .qty-control{display:inline-flex;align-items:center;gap:.25rem;padding:.2rem;border:1px solid #e3dedb;border-radius:999px;background:#f6f3f1}
+    .qty-btn{width:28px;height:28px;border-radius:999px;border:0;background:#fff;cursor:pointer;font-weight:900;line-height:1}
+    .qty-input{width:44px;text-align:center;border:0;background:transparent;font-weight:700}
+    .applepay-btn{display:flex;align-items:center;justify-content:center;width:100%;height:46px;border-radius:12px;border:0;background:#000;color:#fff;font-weight:700;letter-spacing:.01em}
+    .applepay-btn i{margin-right:.4rem}
+    .overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);display:none;align-items:center;justify-content:center;z-index:9999}
+    .overlay.show{display:flex}
+    .spinner{width:40px;height:40px;border-radius:50%;border:4px solid #fff;border-top-color:transparent;animation:spin .9s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .submitting .conceal{color:transparent !important;text-shadow:0 0 .5em rgba(0,0,0,.25);caret-color:transparent}
+    #promoHelp{min-height:1.25rem}
+    #promoHelp.success{color:#198754}
+    #promoHelp.error{color:#b02a37}
+    .btn-ghost.applied{background:#19875410;border-color:#198754;color:#198754}
+    .hide{display:none!important}
 
-    body.duo .filters-bar{display:none!important}
-    #productsGrid.duo{max-width:1200px;margin-inline:auto}
-    .duo .product-thumb{aspect-ratio:16/9}
-    .duo .product-glass{position:static;transform:none;background:transparent;border:0;backdrop-filter:none;padding:1rem 1rem 1.1rem}
-    .duo .product-card{border-radius:1.1rem;box-shadow:0 20px 44px rgba(0,0,0,.45)}
-    .duo .product-card:hover{box-shadow:0 26px 56px rgba(0,0,0,.55),0 0 0 1px color-mix(in oklab,var(--accent),transparent 80%)}
-
-    .checkout-cta{display:block;width:100%;background:linear-gradient(180deg,#eadcc7,#e6d3b8);color:#1b2026;text-align:center;text-decoration:none;
-      border:1px solid #d8c4a7;border-radius:1rem;padding:1rem 1.1rem;font-weight:800;letter-spacing:.02em;
-      box-shadow:0 12px 28px rgba(0,0,0,.22), inset 0 1px 0 rgba(255,255,255,.5);transition:transform .12s ease,box-shadow .12s ease,filter .2s ease}
-    .checkout-cta:hover{filter:saturate(1.03);transform:translateY(-1px);box-shadow:0 18px 36px rgba(0,0,0,.28)}
-    .checkout-cta:active{transform:translateY(0);box-shadow:0 12px 28px rgba(0,0,0,.22)}
-    .checkout-cta i{margin-right:.5rem}
-    footer{color:var(--muted);border-top:1px solid var(--line)}
-
-    /* === Inventory badge (bright translucent red) — only used on TEE === */
-    .inv-badge{
-      position:absolute;top:.6rem;right:.6rem;
-      min-width:2.6rem;padding:.28rem .58rem;border-radius:.55rem;
-      background: rgba(255, 56, 56, .28);
-      border: 1px solid rgba(255, 56, 56, .6);
-      color:#fff;font-weight:900;font-size:.85rem;text-align:center;letter-spacing:.02em;
-      backdrop-filter: blur(6px);
-      box-shadow: 0 6px 14px rgba(0,0,0,.28), inset 0 1px 0 rgba(255,255,255,.35);
-      text-shadow: 0 1px 0 rgba(0,0,0,.25);
-      line-height:1;
-      z-index:2;
-    }
-
-    /* ===== Fancy dropdown (variants) ===== */
-    .select-wrap{
-      position:relative; margin-top:.35rem;
-    }
-    .select-wrap label{
-      display:block; font-size:.82rem; color:var(--muted); margin-bottom:.25rem;
-    }
-    .select-wrap select{
-      width:100%;
-      appearance:none; -webkit-appearance:none; -moz-appearance:none;
-      background:#12161b;
-      color:var(--text);
-      border:1px solid #3a424b;
-      border-radius:.6rem;
-      padding:.55rem .9rem;
-      font-weight:800; letter-spacing:.02em;
-      box-shadow:0 6px 16px rgba(0,0,0,.22) inset, 0 6px 14px rgba(0,0,0,.18);
-    }
-    .select-wrap select:focus{outline:none; border-color:var(--accent); box-shadow:0 0 0 2px rgba(214,44,44,.18)}
-    .select-wrap .chev{
-      position:absolute; right:.6rem; top:50%; transform:translateY(-50%);
-      pointer-events:none; color:#9aa3ae; opacity:.9;
-    }
-    .select-wrap option[disabled]{color:#7b848e}
+    /* Delivery toggle */
+    .delivery-wrap{border:1px solid var(--line);border-radius:12px;background:#fff;padding:.6rem}
+    .btn-delivery{font-weight:800}
+    .btn-delivery.active{background:#eaf6ec;border-color:#198754;color:#0f5132}
+    .btn-delivery.ship{background:#fff}
+    .helper{font-size:.85rem}
   </style>
 </head>
-<body id="shop-page">
+<body>
+<nav class="navbar navbar-expand-lg fixed-top rc-nav" aria-label="Checkout Navigation">
+  <div class="container px-4 px-lg-5">
+    <a class="navbar-brand rc-brand" href="index.html">
+      <span class="rc-brand-main">REMEDI’S</span> <span class="rc-brand-sub">CLOSET</span>
+    </a>
 
-  <!-- NAV -->
-  <nav class="navbar navbar-expand-lg fixed-top rc-nav" aria-label="Shop Navigation">
-    <div class="container px-4 px-lg-5">
-      <a class="navbar-brand rc-brand" href="index.html">
-        <span class="rc-brand-main">REMEDI’S</span> <span class="rc-brand-sub">CLOSET</span>
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navShopMenu">
-        <i class="fas fa-bars"></i>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navCheckoutMenu">
+      <i class="fas fa-bars"></i>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navCheckoutMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="index.html">Entrance</a></li>
+        <li class="nav-item d-lg-none mt-3"><span class="nav-link text-muted small fst-italic">stay on checkout — you’re already here 😉</span></li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<header class="hero-slim mt-5">
+  <div class="container">
+    <h1>Checkout</h1>
+    <p class="text-white-50 mt-2">Secure • Encrypted</p>
+  </div>
+</header>
+
+<main class="checkout-shell">
+  <div class="checkout-grid">
+    <!-- LEFT -->
+    <section class="summary-card">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <h2 class="card-title h5 mb-0">Order summary</h2>
+        <span class="chip"><span class="dot"></span> Neutral</span>
+      </div>
+      <div id="orderItems" class="mb-2"></div>
+
+      <div class="d-flex gap-2 mb-2">
+        <input id="promoInput" class="form-control" placeholder="Promo code (e.g. FREEYOMIND)" aria-label="Promo code">
+        <button id="applyPromo" class="btn btn-ghost" type="button" disabled>Apply</button>
+      </div>
+      <div id="promoHelp" class="form-text"></div>
+
+      <!-- Delivery choice (Local Exchange default, Shipping $8) -->
+      <div class="mb-2">
+        <span class="small text-muted d-block mb-1">Delivery</span>
+        <div class="delivery-wrap">
+          <div class="btn-group w-100" role="group" aria-label="Delivery method">
+            <input class="btn-check" type="radio" name="delivery" id="deliverMeet" value="meet" checked>
+            <label class="btn btn-outline-success btn-delivery flex-grow-1" for="deliverMeet">Local Exchange — $0.00</label>
+
+            <input class="btn-check" type="radio" name="delivery" id="deliverShip" value="ship">
+            <label class="btn btn-outline-secondary btn-delivery ship flex-grow-1" for="deliverShip">Ship to me — $8.00</label>
+          </div>
+          <div id="deliveryHelp" class="helper mt-2 text-success">
+            Preferred: Local Exchange — we’ll email you to coordinate a meet-up for pickup.
+          </div>
+        </div>
+      </div>
+
+      <div class="totals mt-2">
+        <div class="row"><div class="col">Subtotal</div><div class="col-auto" id="subtotal" aria-live="polite">$0</div></div>
+        <div class="row text-success d-none" id="discountRow">
+          <div class="col">Discount (<span id="discountName"></span>)</div>
+          <div class="col-auto" id="discount">-$0</div>
+        </div>
+        <div class="row"><div class="col">Shipping</div><div class="col-auto" id="shipping">$0</div></div>
+        <div class="row"><div class="col">Tax <span class="text-muted">(est.)</span></div><div class="col-auto" id="tax">$0</div></div>
+        <div class="row grand"><div class="col"><strong>Total due</strong></div><div class="col-auto"><strong id="grandTotal" aria-live="polite">$0</strong></div></div>
+      </div>
+    </section>
+
+    <!-- RIGHT -->
+    <section class="form-card">
+      <h2 class="card-title h5 mb-3">Payment</h2>
+
+      <button type="button" class="applepay-btn mb-3" aria-label="Apple Pay or Cash App">
+        <i class="fab fa-apple"></i> Pay (Wallets on Stripe)
       </button>
-      <div class="collapse navbar-collapse" id="navShopMenu">
-        <ul class="navbar-nav ms-auto align-items-lg-center">
-          <li class="nav-item"><a class="nav-link" href="index.html">Entrance</a></li>
-          <li class="nav-item"><a class="nav-link" href="checkout.html">Checkout</a></li>
-          <li class="nav-item ms-lg-3">
-            <a class="btn btn-sm btn-outline-light" href="checkout.html">
-              <i class="fas fa-lock me-1"></i> Cart
-              <span id="cartCount" class="badge badge-soft ms-1" aria-live="polite">0</span>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </nav>
 
-  <!-- HERO -->
-  <header class="shop-hero">
-    <div class="container">
-      <h1>Access: Shop</h1>
-      <p>Authorized items only. Limited drops.</p>
-    </div>
-  </header>
-
-  <!-- CONTENT -->
-  <main class="py-5" id="content">
-    <div class="container">
-      <div class="filters-bar mb-4" id="filtersBar">
-        <form class="row g-2 align-items-center" id="filtersForm">
-          <div class="col-12 col-md-5">
-            <label class="visually-hidden" for="search">Search</label>
-            <input class="form-control form-control-sm" id="search" type="search" placeholder="Search inventory…">
-          </div>
-          <div class="col-6 col-md-3">
-            <label class="visually-hidden" for="category">Category</label>
-            <select id="category" class="form-select form-select-sm">
-              <option value="">All categories</option>
-              <option>Tops</option>
-              <option>Hoodies</option>
-              <option>Accessories</option>
-            </select>
-          </div>
-          <div class="col-6 col-md-2">
-            <label class="visually-hidden" for="sort">Sort</label>
-            <select id="sort" class="form-select form-select-sm">
-              <option value="new">Newest</option>
-              <option value="low">Price: Low → High</option>
-              <option value="high">Price: High → Low</option>
-            </select>
-          </div>
-          <div class="col-12 col-md-2 text-md-end">
-            <button type="button" class="btn btn-sm btn-outline-danger" id="resetFilters">
-              <i class="fas fa-rotate-left me-1"></i> Reset
-            </button>
-          </div>
-        </form>
+      <div class="mb-3">
+        <span class="section-label">Contact</span>
+        <label class="form-label small text-muted" for="email" hidden>Email</label>
+        <input id="email" type="email" class="form-control" placeholder="email@example.com" autocomplete="email" required>
       </div>
 
-      <!-- Products -->
-      <section aria-labelledby="productsHeading">
-        <h2 id="productsHeading" class="visually-hidden">Products</h2>
-        <div class="row g-3 row-cols-2 row-cols-md-3 row-cols-lg-4 justify-content-center" id="productsGrid"></div>
-        <a href="checkout.html" class="checkout-cta mt-3" aria-label="Go to checkout">
-          <i class="fas fa-lock"></i> Go To Checkout
-        </a>
-      </section>
-    </div>
-  </main>
-
-  <!-- FOOTER -->
-  <footer class="py-4">
-    <div class="container text-center small">
-      ACCESS LOG • <span class="text-muted">Remedi’s Closet</span> • <span id="year"></span>
-    </div>
-  </footer>
-
-  <!-- JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="js/cart.js"></script>
-
-  <script>
-    // ---- Only show inventory on the Tee (1 left). Hat gets NO badge. ----
-    const TEE_SKUS = new Set(['RC-TEE-001','RCTEE001','RC_TEE_001']);
-    const ONE_LEFT = 1;
-    const norm = s => String(s||'').toUpperCase().replace(/\s+/g,'').trim();
-
-    const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
-    let PRODUCTS = [];
-
-    fetch(CATALOG_API, { credentials: 'omit' })
-      .then(r => r.json())
-      .then(data => {
-        PRODUCTS = data?.products || [];
-
-        for (const p of PRODUCTS) {
-          const skuN = norm(p.sku);
-
-          // fallback images
-          if (!p.image) {
-            if (skuN.includes('HAT')) p.image = 'assets/img/ipad.jpg';
-            if (skuN.includes('TEE')) p.image = 'assets/img/onPerson2.JPG';
-          }
-
-          // inventory badge: only tee
-          const isTeeBySku  = TEE_SKUS.has(skuN);
-          const isTeeByName = /tee\b/i.test(String(p.name||''));
-          if (isTeeBySku || isTeeByName) p.inventory = ONE_LEFT; else delete p.inventory;
-
-          // === attach variants (for dropdown) ===
-          if (skuN.includes('HAT')) {
-            p.variants = {
-              label: 'Color',
-              type: 'color',
-              options: [
-                { id:'rose-gold', label:'Rose Gold', disabled:false, selected:true },
-                { id:'black',     label:'Black',     disabled:false, selected:false },
-              ]
-            };
-          }
-          if (skuN.includes('TEE')) {
-            p.variants = {
-              label: 'Size',
-              type: 'size',
-              options: [
-                { id:'xs', label:'XS', disabled:true },
-                { id:'s',  label:'S',  disabled:true },
-                { id:'m',  label:'M',  disabled:false, selected:true },
-                { id:'l',  label:'L',  disabled:true },
-                { id:'xl', label:'XL', disabled:true },
-              ]
-            };
-          }
-        }
-
-        renderProducts(PRODUCTS);
-
-        if (PRODUCTS.length <= 2) {
-          document.body.classList.add('duo');
-          document.getElementById('filtersBar')?.classList.add('d-none');
-          const grid = document.getElementById('productsGrid');
-          grid.className = 'row g-4 justify-content-center duo row-cols-1 row-cols-lg-2';
-        }
-      })
-      .catch(err => console.error('Catalog fetch error:', err));
-
-    function renderProducts(items) {
-      const grid = document.getElementById('productsGrid');
-      grid.innerHTML = items.map(cardHTML).join('');
-    }
-
-    function cardHTML(p) {
-      const price = formatUSD(p.price);
-      const badge = p.badge ? `<span class="badge-soft">${esc(p.badge)}</span>` : '';
-      const meta  = `${esc(p.category)} • ${esc(p.stock || 'On hand')}`;
-      const inv   = (typeof p.inventory === 'number') ? `<span class="inv-badge">${p.inventory} left</span>` : '';
-      const variantHTML = variantDropdown(p);
-
-      return `
-        <div class="col">
-          <article class="product-card glass-hover" data-sku="${esc(p.sku)}" data-category="${esc(p.category)}" data-price="${esc(p.price)}">
-            <div class="product-thumb">
-              ${inv}
-              <img src="${esc(p.image)}" alt="${esc(p.alt || p.name)}" loading="lazy"
-                   onerror="this.closest('.product-thumb').classList.add('is-missing')">
-            </div>
-            <div class="product-glass">
-              <h3 class="product-title h6 mb-0">${esc(p.name)}</h3>
-              <div class="product-meta">${meta}</div>
-              <div class="glass-row">
-                <div class="price">${price}</div>
-                ${badge}
-              </div>
-              ${p.desc ? `<p class="product-desc">${esc(p.desc)}</p>` : ``}
-
-              ${variantHTML}
-
-              <button class="btn-ghost mt-2" data-sku="${esc(p.sku)}" aria-label="Add ${esc(p.name)} to cart">
-                <i class="fas fa-key me-1"></i> Add to Cart
-              </button>
-            </div>
-          </article>
+      <div class="mb-3">
+        <div class="d-flex align-items-center justify-content-between">
+          <span class="section-label mb-0">Shipping address</span>
+          <span class="small text-muted" id="addrHint">Address not needed for Local Exchange</span>
         </div>
-      `;
-    }
-
-    // ---- Variant dropdown block ----
-    function variantDropdown(p){
-      if (!p.variants?.options?.length) return '';
-      const v = p.variants;
-
-      // ensure one option is selected (first enabled if none flagged)
-      let hasSel = v.options.some(o => o.selected && !o.disabled);
-      if (!hasSel){
-        const firstEnabled = v.options.find(o => !o.disabled);
-        if (firstEnabled) firstEnabled.selected = true;
-      }
-
-      const opts = v.options.map(opt => {
-        const dis = opt.disabled ? 'disabled' : '';
-        const sel = opt.selected ? 'selected' : '';
-        return `<option value="${esc(opt.id)}" ${dis} ${sel}>${esc(opt.label)}${opt.disabled ? ' — unavailable' : ''}</option>`;
-      }).join('');
-
-      return `
-        <div class="select-wrap">
-          <label>${esc(v.label)}</label>
-          <select data-role="variant-select" data-sku="${esc(p.sku)}" data-label="${esc(v.label)}">
-            ${opts}
-          </select>
-          <span class="chev"><i class="fas fa-chevron-down"></i></span>
+        <div id="addressBlock" class="row g-2 hide">
+          <div class="col-12"><input id="fullName" class="form-control" placeholder="Full name" autocomplete="name" required></div>
+          <div class="col-12 col-md-6">
+            <select id="country" class="form-select" autocomplete="country">
+              <option>United States</option><option>Canada</option><option>United Kingdom</option>
+            </select>
+          </div>
+          <div class="col-12 col-md-6"><input id="address" class="form-control" placeholder="Address" autocomplete="address-line1" required></div>
+          <div class="col-6 col-md-4"><input id="city" class="form-control" placeholder="City" autocomplete="address-level2" required></div>
+          <div class="col-3 col-md-4"><input id="state" class="form-control" placeholder="State/Prov." autocomplete="address-level1" required></div>
+          <div class="col-3 col-md-4"><input id="zip" class="form-control" placeholder="ZIP" autocomplete="postal-code" inputmode="numeric" required></div>
         </div>
-      `;
+      </div>
+
+      <button id="payBtn" class="btn btn-dark w-100 py-2 fw-bold" type="button">Pay</button>
+
+      <div class="d-flex justify-content-between small mt-3 text-muted">
+        <a href="#" class="text-decoration-underline">Free returns & exchanges</a>
+        <span>Powered by Stripe • Legal • Returns • Contact</span>
+      </div>
+    </section>
+  </div>
+
+  <div class="text-center mt-4 foot-note small">
+    ACCESS LOG • <span class="text-muted">Remedi’s Closet</span> • <span id="year"></span>
+  </div>
+</main>
+
+<div class="overlay" id="overlay"><div class="spinner" aria-hidden="true"></div></div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="js/cart.js"></script>
+<script>
+  const API_URL = 'https://remedis-api.vercel.app/api/checkoutRedirect';
+  const CATALOG_API = 'https://remedis-api.vercel.app/api/catalog';
+
+  // ------- Cart preview -------
+  let CART = (window.Cart?.load ? Cart.load() : []);
+  const fmtUSD = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(n);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  const els = {
+    items: orderItems, subtotal: subtotal, discountRow: discountRow, discountName: discountName,
+    discount: discount, shipping: shipping, tax: tax, total: grandTotal,
+    promo: promoInput, applyPromo: applyPromo,
+    email: email, fullName: fullName, address: address, city: city, state: state, zip: zip, country: country,
+    payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay'),
+    addressBlock: document.getElementById('addressBlock'),
+    deliveryRadios: () => document.querySelectorAll('input[name="delivery"]')
+  };
+
+  const DELIVERY_HELP = document.getElementById('deliveryHelp');
+
+  // If cart.js wasn't used (fallback path), pull from localStorage and enrich by SKU
+  async function ensureCartHasDetails() {
+    if (CART && CART.length && CART[0].name) return;
+    if (!window.Cart?.load) {
+      const k = 'rc_cart_v1';
+      try {
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (!raw.length) { CART = []; return; }
+
+        const res = await fetch(CATALOG_API, { credentials: 'omit' });
+        const data = await res.json().catch(()=>null);
+        const catalog = (data && data.products) ? data.products : [];
+
+        CART = raw.map(it => {
+          const p = catalog.find(x => String(x.sku) === String(it.sku)) || {};
+          return {
+            sku: it.sku,
+            qty: it.qty || 1,
+            name: p.name || it.name || it.sku,
+            price: Number(p.price ?? it.price ?? 0),
+            image: p.image || it.image || 'assets/img/ipad.jpg',
+            variant: it.variant || null
+          };
+        });
+      } catch { CART = []; }
+    }
+  }
+
+  // Conceal on submit (without clearing values)
+  const sensitiveFields = [email, fullName, address, city, state, zip, country];
+  function concealSensitive(on){
+    document.body.classList.toggle('submitting', on);
+    sensitiveFields.forEach(el => el && el.classList.toggle('conceal', on));
+    [promoInput, applyPromo, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link'), ...els.deliveryRadios()]
+      .forEach(el => el && (el.disabled = on));
+    if (els.appleBtn) els.appleBtn.style.visibility = on ? 'hidden' : '';
+    const help = document.getElementById('promoHelp'); if (help) help.textContent = '';
+  }
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function renderItems(){
+    if (!CART.length){
+      els.items.innerHTML = '<div class="text-muted small">Your bag is empty. <a href="shop.html">Continue shopping</a>.</div>';
+      recalc(); return;
+    }
+    els.items.innerHTML = CART.map((it,i)=>`
+      <article class="item">
+        <img src="${it.image}" alt="${esc(it.name)}" loading="lazy">
+        <div>
+          <div class="item-name">${esc(it.name)}
+            ${it.variant ? `<div class="small text-muted mt-1">${esc(it.variant.label)}: <strong>${esc(it.variant.name)}</strong></div>` : ``}
+          </div>
+          <div class="text-muted small">${fmtUSD(it.price)}</div>
+          <div class="subrow mt-1">
+            <div class="qty-control" data-i="${i}">
+              <button class="qty-btn" data-delta="-1" type="button" aria-label="Decrease">−</button>
+              <input class="qty-input" type="number" min="0" value="${it.qty}" data-i="${i}" aria-label="Quantity">
+              <button class="qty-btn" data-delta="1" type="button" aria-label="Increase">+</button>
+            </div>
+            <a href="#" class="remove-link" data-remove="${i}">Remove</a>
+          </div>
+        </div>
+        <div class="price-col fw-bold">${fmtUSD(it.price*it.qty)}</div>
+      </article>`).join('');
+  }
+  function calcSubtotal(){ return CART.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty||0),0) }
+  function estTax(taxable){
+    const us = (country.value||'').includes('United States');
+    const zipOk = (zip.value||'').trim().length >= 5;
+    return (us && zipOk) ? taxable * 0.08 : 0;
+  }
+
+  // ---------- PROMO (FREEYOMIND only) ----------
+  const COUPON_KEY = 'rc_coupon_v1';
+  let coupon = null;
+
+  try { coupon = JSON.parse(localStorage.getItem(COUPON_KEY) || 'null'); } catch { coupon = null; }
+
+  function normCode(raw){
+    return String(raw || '').toUpperCase().replace(/[^A-Z0-9]/g,'').trim();
     }
 
-    function formatUSD(n){
-      return new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:0}).format(n);
+  async function verifyPromo(raw){
+    const code = normCode(raw);
+    if(!code) return { ok:false, message:'Enter the code.' };
+    if(code === 'FREEYOMIND') return { ok:true, code, type:'stripe', message:'Code recognized — will apply at Stripe checkout.' };
+    return { ok:false, message:'Invalid code.' };
+  }
+
+  function syncPromoUI(state){
+    const help = document.getElementById('promoHelp');
+    if(state === 'applied'){
+      applyPromo.classList.add('applied'); applyPromo.textContent = 'Applied';
+      help.className = 'form-text success'; help.textContent = coupon?.message || 'Code recognized.';
+    }else if(state === 'removed'){
+      applyPromo.classList.remove('applied'); applyPromo.textContent = 'Apply';
+      help.className = 'form-text'; help.textContent = '';
+    }else if(typeof state === 'string'){
+      applyPromo.classList.remove('applied'); applyPromo.textContent = 'Apply';
+      help.className = 'form-text error'; help.textContent = state;
     }
-    function esc(s){
-      return String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+  }
+
+  async function applyCode(){
+    const current = normCode(promoInput.value);
+    if(coupon?.code && current === coupon.code){
+      coupon = null; localStorage.removeItem(COUPON_KEY); syncPromoUI('removed'); recalc(); return;
     }
+    applyPromo.disabled = true;
+    const res = await verifyPromo(current);
+    if(!res.ok){ syncPromoUI(res.message); applyPromo.disabled = false; return; }
+    coupon = res; localStorage.setItem(COUPON_KEY, JSON.stringify(coupon));
+    promoInput.value = coupon.code; syncPromoUI('applied'); recalc(); applyPromo.disabled = false;
+  }
 
-    // ===== Add-to-cart (reads dropdown selection) + fallback =====
-    document.addEventListener('click', (e) => {
-      const btn = e.target.closest('button.btn-ghost[data-sku]');
-      if (!btn) return;
+  promoInput.addEventListener('input', ()=>{
+    promoInput.value = normCode(promoInput.value);
+    applyPromo.disabled = !promoInput.value;
+    if(coupon?.code && promoInput.value !== coupon.code){
+      applyPromo.classList.remove('applied'); applyPromo.textContent = 'Apply';
+      document.getElementById('promoHelp').textContent = '';
+    }
+  });
+  applyPromo.addEventListener('click', applyCode);
+  promoInput.addEventListener('keydown', e => { if(e.key==='Enter'){ e.preventDefault(); applyCode(); } });
 
-      const sku = btn.dataset.sku;
-      const prod = PRODUCTS.find(p => String(p.sku) === sku);
-      if (!prod) return;
-
-      // read selected variant (if any) from dropdown
-      const card = btn.closest('.product-card');
-      let variant = null;
-      const select = card?.querySelector('select[data-role="variant-select"]');
-      if (select){
-        const label = select.dataset.label || 'Option';
-        const opt = select.selectedOptions[0];
-        variant = { label, id: opt?.value || null, name: opt?.textContent?.replace(/ — unavailable$/,'') || null };
-      }
-
-      if (window.Cart?.add) {
-        Cart.add({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image, variant }, 1);
-        window.Cart?.syncBadge?.();
-      } else {
-        const k = 'rc_cart_v1';
-        const cart = JSON.parse(localStorage.getItem(k) || '[]');
-        // key by sku + variantId
-        const key = JSON.stringify({ sku: prod.sku, variantId: variant?.id || null });
-        const i = cart.findIndex(x => JSON.stringify({ sku: x.sku, variantId: x.variant?.id || null }) === key);
-        if (i > -1) cart[i].qty = (cart[i].qty || 0) + 1;
-        else cart.push({ sku: prod.sku, name: prod.name, price: prod.price, image: prod.image, variant, qty: 1 });
-        localStorage.setItem(k, JSON.stringify(cart));
-        document.dispatchEvent(new CustomEvent('rc:cart-changed'));
-        const count = cart.reduce((s, it) => s + (it.qty || 1), 0);
-        const badge = document.getElementById('cartCount');
-        if (badge) badge.textContent = String(count);
-      }
-
-      btn.innerHTML = `<i class="fas fa-unlock me-1"></i> Added${variant?.name ? ` (${esc(variant.name)})` : ''}`;
-      setTimeout(() => btn.innerHTML = '<i class="fas fa-key me-1"></i> Add to Cart', 900);
+  // Delivery helpers
+  const addrInputs = [fullName, address, city, state, zip, country];
+  function currentDelivery(){
+    const checked = document.querySelector('input[name="delivery"]:checked');
+    return checked ? checked.value : 'meet';
+  }
+  function calcShipping(){ return (currentDelivery() === 'ship') ? 8 : 0; }
+  function toggleAddress(){
+    const meet = (currentDelivery() === 'meet');
+    addressBlock.classList.toggle('hide', meet);
+    addrInputs.forEach(input => {
+      if (!input) return;
+      if (meet) { input.dataset.wasRequired = input.required ? '1' : ''; input.required = false; }
+      else { if (input.dataset.wasRequired === '1') input.required = true; }
     });
+    document.getElementById('addrHint').textContent = meet ? 'Address not needed for Local Exchange' : 'Enter address';
+    DELIVERY_HELP.classList.toggle('text-success', meet);
+    DELIVERY_HELP.classList.toggle('text-muted', !meet);
+  }
 
-    // Filters reset (kept for future expansion)
-    document.getElementById('resetFilters')?.addEventListener('click', () => {
-      document.getElementById('filtersForm').reset();
+  // Totals
+  function discountAmount(sub){ return 0; }
+  function recalc(){
+    const sub = calcSubtotal();
+    const disc = discountAmount(sub);
+    const ship = calcShipping();
+    const taxable = Math.max(0, sub - disc);
+    const taxAmt = estTax(taxable);
+    const total = Math.max(0, taxable + ship + taxAmt);
+    subtotal.textContent = fmtUSD(sub);
+    discountRow.classList.add('d-none');
+    shipping.textContent = fmtUSD(ship);
+    tax.textContent = fmtUSD(taxAmt);
+    grandTotal.textContent = fmtUSD(total);
+
+    // update visual state of delivery buttons
+    document.querySelectorAll('.btn-delivery').forEach(lbl=>{
+      const input = document.getElementById(lbl.getAttribute('for'));
+      if (!input) return;
+      lbl.classList.toggle('active', input.checked);
     });
+  }
 
-    document.getElementById('year').textContent = new Date().getFullYear();
-  </script>
+  // Bind delivery change
+  document.querySelectorAll('input[name="delivery"]').forEach(r=>{
+    r.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
+  });
+
+  // ---------- CART CONTROLS ----------
+  orderItems.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.qty-btn');
+    if(btn){
+      const d = +btn.dataset.delta, idx = +btn.closest('.qty-control').dataset.i;
+      CART[idx].qty = Math.max(0,(CART[idx].qty||0)+d);
+      if(CART[idx].qty===0) CART.splice(idx,1);
+      Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc(); return;
+    }
+    const i = e.target.dataset.remove;
+    if(i!==undefined){ e.preventDefault(); CART.splice(i,1); Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc(); }
+  });
+  orderItems.addEventListener('input',(e)=>{
+    if(!e.target.classList.contains('qty-input')) return;
+    const idx = +e.target.dataset.i;
+    const clean = Math.max(0, parseInt(String(e.target.value).replace(/\D+/g,''),10) || 0);
+    CART[idx].qty = clean; e.target.value = clean; if(clean===0) CART.splice(idx,1);
+    Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc();
+  });
+
+  // initial load
+  (async () => {
+    await ensureCartHasDetails();
+    renderItems(); toggleAddress(); recalc(); Cart?.syncBadge?.();
+  })();
+
+  // ------- Stripe Checkout redirect -------
+  async function startStripeCheckout(){
+    if (!CART.length){ alert('Your cart is empty.'); return; }
+
+    const payload = {
+      email: email.value.trim(),             // <-- backend: set customer_email to this
+      full_name: fullName.value.trim(),
+      address: address.value.trim(),
+      city: city.value.trim(),
+      state: state.value.trim(),
+      zip: zip.value.trim(),
+      country: country.value,
+      ship_method: currentDelivery(),        // 'ship' or 'meet'
+      promo_code: (document.getElementById('promoInput').value || '').trim(),
+      cart: CART.map(i => ({
+        sku: i.sku,
+        qty: i.qty,
+        variant_id: i.variant?.id || null,
+        variant_name: i.variant?.name || null,
+        variant_label: i.variant?.label || null
+      }))
+    };
+    if (!payload.email){ alert('Please enter your email.'); return; }
+
+    try{
+      concealSensitive(true);
+      setLoading(true);
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(()=>null);
+      if(!res.ok || !data?.url) throw new Error(data?.error || 'Checkout error');
+      window.location = data.url;
+    }catch(err){
+      alert('Could not start checkout. Please try again.');
+      concealSensitive(false);
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  function setLoading(on){
+    els.overlay.classList.toggle('show', on);
+    els.payBtn.disabled = on;
+    if (els.appleBtn) els.appleBtn.disabled = on;
+    els.payBtn.textContent = on ? 'Redirecting…' : 'Pay';
+  }
+
+  document.getElementById('payBtn').addEventListener('click', startStripeCheckout);
+  document.querySelector('.applepay-btn')?.addEventListener('click', startStripeCheckout);
+</script>
 </body>
 </html>
