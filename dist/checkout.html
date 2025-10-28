@@ -91,6 +91,7 @@
     .applepay-btn i{margin-right:.4rem}
     .btn-ghost{border:1px solid var(--accent);color:var(--accent);background:rgba(214,44,44,.06);border-radius:999px;font-weight:800}
     .btn-ghost:hover{background:var(--accent);color:#fff}
+    .btn-ghost.applied{background:#19875410;border-color:#198754;color:#198754}
 
     /* Items */
     #orderItems{display:grid;gap:12px;margin-top:.25rem}
@@ -111,29 +112,46 @@
     .spinner{width:40px;height:40px;border-radius:50%;border:4px solid #fff;border-top-color:transparent;animation:spin .9s linear infinite}
     @keyframes spin{to{transform:rotate(360deg)}}
     .submitting .conceal{color:transparent !important;text-shadow:0 0 .5em rgba(0,0,0,.25);caret-color:transparent}
+    #promoHelp{min-height:1.25rem}
+    #promoHelp.success{color:#198754}
+    #promoHelp.error{color:#b02a37}
     .hide{display:none!important}
 
-    /* Pretty native dropdown */
+    /* Pretty native dropdown (keeps accessibility but matches panels) */
     .select-pretty{position:relative}
-    .select-pretty select {
-      appearance:auto;
-      -webkit-appearance:auto;
-      -moz-appearance:auto;
-      width:100%;
-      background:var(--pill);
-      border:1px solid #ddd6d1;
-      color:#2a2a2a;
-      border-radius:10px;
-      padding:.6rem .9rem;
-      font-weight:600;
-      text-transform:none;
-      letter-spacing:.01em;
-      font-size:.95rem;
-      transition:all .2s ease;
-    }
-    .select-pretty select:hover { border-color:#cfc7c2; }
-    .select-pretty select:focus { border-color:#d8cbc1; box-shadow:0 0 0 3px rgba(197,180,167,.25); outline:none; }
-    .select-pretty option { color:#2a2a2a; background:#fff; }
+      .select-pretty select {
+        appearance:auto;
+        -webkit-appearance:auto;
+        -moz-appearance:auto;
+        width:100%;
+        background:var(--pill);
+        border:1px solid #ddd6d1;
+        color:#2a2a2a;
+        border-radius:10px;
+        padding:.6rem .9rem;
+        font-weight:600;            /* Softer weight */
+        text-transform:none;        /* No yelling */
+        letter-spacing:.01em;
+        font-size:.95rem;           /* Matches form fields */
+        transition:all .2s ease;
+      }
+
+      .select-pretty select:hover {
+        border-color:#cfc7c2;
+      }
+
+      .select-pretty select:focus {
+        border-color:#d8cbc1;
+        box-shadow:0 0 0 3px rgba(197,180,167,.25); /* Soft warm glow */
+        outline:none;
+      }
+
+      .select-pretty option {
+        color:#2a2a2a;
+        background:#fff;
+      }
+    .select-pretty select:focus{border-color:#d7cbbd;box-shadow:0 0 0 3px var(--ring)}
+    .select-pretty option{color:#222;background:#fff} /* ensures options list is readable */
 
     .helper{font-size:.85rem;color:#6f757c}
     .badge-soft{display:inline-block;background:#f1e7da;color:#5a4c3e;border:1px solid #eadcc7;padding:.18rem .45rem;border-radius:.4rem;font-size:.72rem;font-weight:800;text-transform:uppercase}
@@ -180,6 +198,8 @@
 
         <div id="orderItems" class="mb-2"></div>
 
+        <!-- (Promo block removed) -->
+
         <!-- Delivery (native but pretty dropdown) -->
         <div class="mb-2">
           <span class="section-label">Delivery</span>
@@ -198,7 +218,8 @@
           <div class="row"><div class="col">Subtotal</div><div class="col-auto" id="subtotal" aria-live="polite">$0</div></div>
           <div class="row text-success d-none" id="discountRow">
             <div class="col">Discount (<span id="discountName"></span>)</div>
-            <div class="col-auto" id="discount">-$0</div></div>
+            <div class="col-auto" id="discount">-$0</div>
+          </div>
           <div class="row"><div class="col">Shipping</div><div class="col-auto" id="shipping">$0</div></div>
           <div class="row"><div class="col">Tax <span class="text-muted">(est.)</span></div><div class="col-auto" id="tax">$0</div></div>
           <div class="row grand"><div class="col"><strong>Total due</strong></div><div class="col-auto"><strong id="grandTotal" aria-live="polite">$0</strong></div></div>
@@ -265,7 +286,7 @@
     // ------- Cart preview -------
     let CART = (window.Cart?.load ? Cart.load() : []);
     const fmtUSD = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(n);
-    const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[m]));
+    const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
     const els = {
       items: orderItems, subtotal: subtotal, discountRow: discountRow, discountName: discountName,
       discount: discount, shipping: shipping, tax: tax, total: grandTotal,
@@ -349,24 +370,11 @@
       return (us && zipOk) ? taxable * 0.08 : 0;
     }
 
-    // Totals
-    function discountAmount(sub){ return 0; }
-    function recalc(){
-      const sub = calcSubtotal();
-      const disc = discountAmount(sub);
-      const ship = (els.shipMethod.value === 'ship') ? 8 : 0;
-      const taxable = Math.max(0, sub - disc);
-      const taxAmt = estTax(taxable);
-      const total = Math.max(0, taxable + ship + taxAmt);
-      subtotal.textContent = fmtUSD(sub);
-      discountRow.classList.add('d-none');
-      shipping.textContent = fmtUSD(ship);
-      tax.textContent = fmtUSD(taxAmt);
-      grandTotal.textContent = fmtUSD(total);
-    }
-
+    // Delivery helpers (dropdown)
+    function currentDelivery(){ return els.shipMethod.value; }
+    function calcShipping(){ return (currentDelivery() === 'ship') ? 8 : 0; }
     function toggleAddress(){
-      const meet = (els.shipMethod.value === 'meet');
+      const meet = (currentDelivery() === 'meet');
       addressBlock.classList.toggle('hide', meet);
       const inputs = [fullName, address, city, state, zip, country];
       inputs.forEach(input => {
@@ -378,6 +386,22 @@
       DELIVERY_HELP.innerHTML = meet
         ? '<span class="badge-soft me-1">Preferred</span> Local Exchange — we’ll email you to coordinate a meet-up for pickup.'
         : 'Your order ships to the address below.';
+    }
+
+    // Totals
+    function discountAmount(sub){ return 0; }
+    function recalc(){
+      const sub = calcSubtotal();
+      const disc = discountAmount(sub);
+      const ship = calcShipping();
+      const taxable = Math.max(0, sub - disc);
+      const taxAmt = estTax(taxable);
+      const total = Math.max(0, taxable + ship + taxAmt);
+      subtotal.textContent = fmtUSD(sub);
+      discountRow.classList.add('d-none');
+      shipping.textContent = fmtUSD(ship);
+      tax.textContent = fmtUSD(taxAmt);
+      grandTotal.textContent = fmtUSD(total);
     }
 
     // Bind delivery change
@@ -421,7 +445,7 @@
         state: state.value.trim(),
         zip: zip.value.trim(),
         country: country.value,
-        ship_method: els.shipMethod.value,     // 'ship' or 'meet'
+        ship_method: currentDelivery(),        // 'ship' or 'meet'
         cart: CART.map(i => ({
           sku: i.sku,
           qty: i.qty,
