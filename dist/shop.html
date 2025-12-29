@@ -242,18 +242,18 @@
           const isTee = TEE_SKUS.has(skuN) || skuN.includes('TEE') || /\bTEE\b/i.test(name);
           if (isTee) p.inventory = ONE_LEFT; else delete p.inventory;
 
-          // Variants
-          const isHat = skuN.includes('HAT') || /\bHAT\b/i.test(name);
-          if (isHat) {
-            p.variants = {
-              label: 'Color',
-              type: 'color',
-              options: [
-                { id:'rose-gold', label:'Rose Gold', swatch:'rose',  disabled:false, selected:true },
-                { id:'black',     label:'Black',     swatch:'black', disabled:false, selected:false },
-              ]
-            };
-          }
+            // Variants
+            const isHat = skuN.includes('HAT') || /\bHAT\b/i.test(name);
+            if (isHat) {
+              // Only Rose Gold is available now
+              p.variants = {
+                label: 'Color',
+                type: 'color',
+                options: [
+                  { id:'rose-gold', label:'Rose Gold', swatch:'rose', disabled:false, selected:true }
+                ]
+              };
+            }
           if (isTee) {
             p.variants = {
               label: 'Size',

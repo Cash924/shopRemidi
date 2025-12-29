@@ -203,10 +203,9 @@
         <!-- Delivery (native but pretty dropdown) -->
         <div class="mb-2">
           <span class="section-label">Delivery</span>
-          <div class="select-pretty">
-            <select id="shipMethod" aria-label="Choose delivery method">
-              <option value="meet" selected>Local Exchange — $0.00 </option>
-              <option value="ship">Ship to me — $8.00</option>
+         <div class="select-pretty">
+            <select id="shipMethod" aria-label="Delivery method (Local Exchange only)">
+              <option value="meet" selected>Local Exchange — $0.00</option>
             </select>
           </div>
           <div id="deliveryHelp" class="helper mt-2">
@@ -261,9 +260,8 @@
 
         <button id="payBtn" class="btn btn-dark w-100 py-2 fw-bold" type="button">Pay</button>
 
-        <div class="d-flex justify-content-between small mt-3 text-muted">
-          <a href="#" class="text-decoration-underline">Free returns & exchanges</a>
-          <span>Powered by Stripe • Legal • Returns • Contact</span>
+        <div class="d-flex justify-content-end small mt-3 text-muted">
+          <span>Powered by Stripe • Terms • Privacy • Contact</span>
         </div>
       </section>
     </div>
