@@ -283,205 +283,286 @@
 
     // ------- Cart preview -------
     let CART = (window.Cart?.load ? Cart.load() : []);
-    const fmtUSD = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(n);
-    const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
-    const els = {
-      items: orderItems, subtotal: subtotal, discountRow: discountRow, discountName: discountName,
-      discount: discount, shipping: shipping, tax: tax, total: grandTotal,
-      email: email, fullName: fullName, address: address, city: city, state: state, zip: zip, country: country,
-      payBtn: payBtn, appleBtn: document.querySelector('.applepay-btn'), overlay: document.getElementById('overlay'),
-      addressBlock: document.getElementById('addressBlock'),
-      shipMethod: document.getElementById('shipMethod')
-    };
+  const fmtUSD = n => new Intl.NumberFormat('en-US',{style:'currency',currency:'USD',minimumFractionDigits:2}).format(n);
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
 
-    const DELIVERY_HELP = document.getElementById('deliveryHelp');
+  const els = {
+    items: orderItems,
+    subtotal: subtotal,
+    discountRow: discountRow,
+    discountName: discountName,
+    discount: discount,
+    shipping: shipping,
+    tax: tax,
+    total: grandTotal,
 
-    // If cart.js wasn't used (fallback path), pull from localStorage and enrich by SKU
-    async function ensureCartHasDetails() {
-      if (CART && CART.length && CART[0].name) return;
-      if (!window.Cart?.load) {
-        const k = 'rc_cart_v1';
-        try {
-          const raw = JSON.parse(localStorage.getItem(k) || '[]');
-          if (!raw.length) { CART = []; return; }
+    email: email,
+    fullName: typeof fullName !== 'undefined' ? fullName : null,
+    address: typeof address !== 'undefined' ? address : null,
+    city: typeof city !== 'undefined' ? city : null,
+    state: typeof state !== 'undefined' ? state : null,
+    zip: typeof zip !== 'undefined' ? zip : null,
+    country: typeof country !== 'undefined' ? country : null,
 
-          const res = await fetch(CATALOG_API, { credentials: 'omit' });
-          const data = await res.json().catch(()=>null);
-          const catalog = (data && data.products) ? data.products : [];
+    payBtn: payBtn,
+    appleBtn: document.querySelector('.applepay-btn'),
+    overlay: document.getElementById('overlay'),
+    addressBlock: document.getElementById('addressBlock'),
+    shipMethod: document.getElementById('shipMethod')
+  };
 
-          CART = raw.map(it => {
-            const p = catalog.find(x => String(x.sku) === String(it.sku)) || {};
-            return {
-              sku: it.sku,
-              qty: it.qty || 1,
-              name: p.name || it.name || it.sku,
-              price: Number(p.price ?? it.price ?? 0),
-              image: p.image || it.image || 'assets/img/ipad.jpg',
-              variant: it.variant || null
-            };
-          });
-        } catch { CART = []; }
+  const DELIVERY_HELP = document.getElementById('deliveryHelp');
+  const ADDR_HINT = document.getElementById('addrHint');
+
+  // If cart.js wasn't used (fallback path), pull from localStorage and enrich by SKU
+  async function ensureCartHasDetails() {
+    if (CART && CART.length && CART[0].name) return;
+    if (!window.Cart?.load) {
+      const k = 'rc_cart_v1';
+      try {
+        const raw = JSON.parse(localStorage.getItem(k) || '[]');
+        if (!raw.length) { CART = []; return; }
+
+        const res = await fetch(CATALOG_API, { credentials: 'omit' });
+        const data = await res.json().catch(()=>null);
+        const catalog = (data && data.products) ? data.products : [];
+
+        CART = raw.map(it => {
+          const p = catalog.find(x => String(x.sku) === String(it.sku)) || {};
+          return {
+            sku: it.sku,
+            qty: it.qty || 1,
+            name: p.name || it.name || it.sku,
+            price: Number(p.price ?? it.price ?? 0),
+            image: p.image || it.image || 'assets/img/ipad.jpg',
+            variant: it.variant || null
+          };
+        });
+      } catch {
+        CART = [];
       }
     }
+  }
 
-    // Conceal on submit (without clearing values)
-    const sensitiveFields = [email, fullName, address, city, state, zip, country];
-    function concealSensitive(on){
-      document.body.classList.toggle('submitting', on);
-      sensitiveFields.forEach(el => el && el.classList.toggle('conceal', on));
-      [els.shipMethod, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link')]
-        .forEach(el => el && (el.disabled = on));
-      if (els.appleBtn) els.appleBtn.style.visibility = on ? 'hidden' : '';
+  // Conceal on submit (without clearing values)
+  const sensitiveFields = [
+    els.email,
+    els.fullName,
+    els.address,
+    els.city,
+    els.state,
+    els.zip,
+    els.country
+  ].filter(Boolean);
+
+  function concealSensitive(on){
+    document.body.classList.toggle('submitting', on);
+    sensitiveFields.forEach(el => el && el.classList.toggle('conceal', on));
+    [els.shipMethod, ...document.querySelectorAll('.qty-btn,.qty-input,.remove-link')]
+      .forEach(el => el && (el.disabled = on));
+    if (els.appleBtn) els.appleBtn.style.visibility = on ? 'hidden' : '';
+  }
+
+  document.getElementById('year').textContent = new Date().getFullYear();
+
+  function renderItems(){
+    if (!CART.length){
+      els.items.innerHTML = '<div class="text-muted small">Your bag is empty. <a href="shop.html">Continue shopping</a>.</div>';
+      recalc();
+      return;
     }
-
-    document.getElementById('year').textContent = new Date().getFullYear();
-
-    function renderItems(){
-      if (!CART.length){
-        els.items.innerHTML = '<div class="text-muted small">Your bag is empty. <a href="shop.html">Continue shopping</a>.</div>';
-        recalc(); return;
-      }
-      els.items.innerHTML = CART.map((it,i)=>`
-        <article class="item">
-          <img src="${it.image}" alt="${esc(it.name)}" loading="lazy">
-          <div>
-            <div class="item-name">${esc(it.name)}
-              ${it.variant ? `<div class="small text-muted mt-1">${esc(it.variant.label)}: <strong>${esc(it.variant.name)}</strong></div>` : ``}
-            </div>
-            <div class="text-muted small">${fmtUSD(it.price)}</div>
-            <div class="subrow mt-1">
-              <div class="qty-control" data-i="${i}">
-                <button class="qty-btn" data-delta="-1" type="button" aria-label="Decrease">−</button>
-                <input class="qty-input" type="number" min="0" value="${it.qty}" data-i="${i}" aria-label="Quantity">
-                <button class="qty-btn" data-delta="1" type="button" aria-label="Increase">+</button>
-              </div>
-              <a href="#" class="remove-link" data-remove="${i}">Remove</a>
-            </div>
+    els.items.innerHTML = CART.map((it,i)=>`
+      <article class="item">
+        <img src="${it.image}" alt="${esc(it.name)}" loading="lazy">
+        <div>
+          <div class="item-name">${esc(it.name)}
+            ${it.variant ? `<div class="small text-muted mt-1">${esc(it.variant.label)}: <strong>${esc(it.variant.name)}</strong></div>` : ``}
           </div>
-          <div class="price-col fw-bold">${fmtUSD(it.price*it.qty)}</div>
-        </article>`).join('');
-    }
-    function calcSubtotal(){ return CART.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty||0),0) }
-    function estTax(taxable){
-      const us = (country.value||'').includes('United States');
-      const zipOk = (zip.value||'').trim().length >= 5;
-      return (us && zipOk) ? taxable * 0.08 : 0;
+          <div class="text-muted small">${fmtUSD(it.price)}</div>
+          <div class="subrow mt-1">
+            <div class="qty-control" data-i="${i}">
+              <button class="qty-btn" data-delta="-1" type="button" aria-label="Decrease">−</button>
+              <input class="qty-input" type="number" min="0" value="${it.qty}" data-i="${i}" aria-label="Quantity">
+              <button class="qty-btn" data-delta="1" type="button" aria-label="Increase">+</button>
+            </div>
+            <a href="#" class="remove-link" data-remove="${i}">Remove</a>
+          </div>
+        </div>
+        <div class="price-col fw-bold">${fmtUSD(it.price*it.qty)}</div>
+      </article>`).join('');
+  }
+
+  function calcSubtotal(){
+    return CART.reduce((s,i)=>s+Number(i.price||0)*Number(i.qty||0),0);
+  }
+
+  function estTax(taxable){
+    const countryVal = els.country ? (els.country.value || '') : '';
+    const zipVal = els.zip ? (els.zip.value || '') : '';
+    const us = countryVal.includes('United States');
+    const zipOk = zipVal.trim().length >= 5;
+    return (us && zipOk) ? taxable * 0.08 : 0;
+  }
+
+  // Delivery helpers (dropdown)
+  function currentDelivery(){
+    // fallback to 'meet' if dropdown is missing
+    return els.shipMethod ? (els.shipMethod.value || 'meet') : 'meet';
+  }
+
+  function calcShipping(){
+    return (currentDelivery() === 'ship') ? 8 : 0;
+  }
+
+  function toggleAddress(){
+    if (!els.addressBlock || !els.shipMethod) return; // no address UI to toggle
+
+    const meet = (currentDelivery() === 'meet');
+    els.addressBlock.classList.toggle('hide', meet);
+
+    const inputs = [els.fullName, els.address, els.city, els.state, els.zip, els.country].filter(Boolean);
+    inputs.forEach(input => {
+      if (meet) {
+        input.dataset.wasRequired = input.required ? '1' : '';
+        input.required = false;
+      } else {
+        if (input.dataset.wasRequired === '1') input.required = true;
+      }
+    });
+
+    if (ADDR_HINT) {
+      ADDR_HINT.textContent = meet
+        ? 'Address not needed for Local Exchange'
+        : 'Enter address';
     }
 
-    // Delivery helpers (dropdown)
-    function currentDelivery(){ return els.shipMethod.value; }
-    function calcShipping(){ return (currentDelivery() === 'ship') ? 8 : 0; }
-    function toggleAddress(){
-      const meet = (currentDelivery() === 'meet');
-      addressBlock.classList.toggle('hide', meet);
-      const inputs = [fullName, address, city, state, zip, country];
-      inputs.forEach(input => {
-        if (!input) return;
-        if (meet) { input.dataset.wasRequired = input.required ? '1' : ''; input.required = false; }
-        else { if (input.dataset.wasRequired === '1') input.required = true; }
-      });
-      document.getElementById('addrHint').textContent = meet ? 'Address not needed for Local Exchange' : 'Enter address';
+    if (DELIVERY_HELP) {
       DELIVERY_HELP.innerHTML = meet
         ? '<span class="badge-soft me-1">Preferred</span> Local Exchange — we’ll email you to coordinate a meet-up for pickup.'
         : 'Your order ships to the address below.';
     }
+  }
 
-    // Totals
-    function discountAmount(sub){ return 0; }
-    function recalc(){
-      const sub = calcSubtotal();
-      const disc = discountAmount(sub);
-      const ship = calcShipping();
-      const taxable = Math.max(0, sub - disc);
-      const taxAmt = estTax(taxable);
-      const total = Math.max(0, taxable + ship + taxAmt);
-      subtotal.textContent = fmtUSD(sub);
-      discountRow.classList.add('d-none');
-      shipping.textContent = fmtUSD(ship);
-      tax.textContent = fmtUSD(taxAmt);
-      grandTotal.textContent = fmtUSD(total);
-    }
+  // Totals
+  function discountAmount(sub){ return 0; }
 
-    // Bind delivery change
+  function recalc(){
+    const sub = calcSubtotal();
+    const disc = discountAmount(sub);
+    const ship = calcShipping();
+    const taxable = Math.max(0, sub - disc);
+    const taxAmt = estTax(taxable);
+    const total = Math.max(0, taxable + ship + taxAmt);
+
+    els.subtotal.textContent = fmtUSD(sub);
+    els.discountRow.classList.add('d-none');
+    els.shipping.textContent = fmtUSD(ship);
+    els.tax.textContent = fmtUSD(taxAmt);
+    els.total.textContent = fmtUSD(total);
+  }
+
+  // Bind delivery change (guard if dropdown missing)
+  if (els.shipMethod) {
     els.shipMethod.addEventListener('change', ()=>{ toggleAddress(); recalc(); });
+  }
 
-    // ---------- CART CONTROLS ----------
-    orderItems.addEventListener('click', (e)=>{
-      const btn = e.target.closest('.qty-btn');
-      if(btn){
-        const d = +btn.dataset.delta, idx = +btn.closest('.qty-control').dataset.i;
-        CART[idx].qty = Math.max(0,(CART[idx].qty||0)+d);
-        if(CART[idx].qty===0) CART.splice(idx,1);
-        Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc(); return;
-      }
-      const i = e.target.dataset.remove;
-      if(i!==undefined){ e.preventDefault(); CART.splice(i,1); Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc(); }
-    });
-    orderItems.addEventListener('input',(e)=>{
-      if(!e.target.classList.contains('qty-input')) return;
-      const idx = +e.target.dataset.i;
-      const clean = Math.max(0, parseInt(String(e.target.value).replace(/\D+/g,''),10) || 0);
-      CART[idx].qty = clean; e.target.value = clean; if(clean===0) CART.splice(idx,1);
-      Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc();
-    });
+  // ---------- CART CONTROLS ----------
+  orderItems.addEventListener('click', (e)=>{
+    const btn = e.target.closest('.qty-btn');
+    if(btn){
+      const d = +btn.dataset.delta, idx = +btn.closest('.qty-control').dataset.i;
+      CART[idx].qty = Math.max(0,(CART[idx].qty||0)+d);
+      if(CART[idx].qty===0) CART.splice(idx,1);
+      Cart?.save?.(CART); Cart?.syncBadge?.(); renderItems(); recalc(); return;
+    }
+    const i = e.target.dataset.remove;
+    if(i!==undefined){
+      e.preventDefault();
+      CART.splice(i,1);
+      Cart?.save?.(CART); Cart?.syncBadge?.();
+      renderItems(); recalc();
+    }
+  });
 
-    // initial load
-    (async () => {
-      await ensureCartHasDetails();
-      renderItems(); toggleAddress(); recalc(); Cart?.syncBadge?.();
-    })();
+  orderItems.addEventListener('input',(e)=>{
+    if(!e.target.classList.contains('qty-input')) return;
+    const idx = +e.target.dataset.i;
+    const clean = Math.max(0, parseInt(String(e.target.value).replace(/\D+/g,''),10) || 0);
+    CART[idx].qty = clean;
+    e.target.value = clean;
+    if(clean===0) CART.splice(idx,1);
+    Cart?.save?.(CART); Cart?.syncBadge?.();
+    renderItems(); recalc();
+  });
 
-    // ------- Stripe Checkout redirect -------
-    async function startStripeCheckout(){
-      if (!CART.length){ alert('Your cart is empty.'); return; }
+  // initial load
+  (async () => {
+    await ensureCartHasDetails();
+    renderItems();
+    toggleAddress();
+    recalc();
+    Cart?.syncBadge?.();
+  })();
 
-      const payload = {
-        email: email.value.trim(),             // backend sets customer_email from this
-        full_name: fullName.value.trim(),
-        address: address.value.trim(),
-        city: city.value.trim(),
-        state: state.value.trim(),
-        zip: zip.value.trim(),
-        country: country.value,
-        ship_method: currentDelivery(),        // 'ship' or 'meet'
-        cart: CART.map(i => ({
-          sku: i.sku,
-          qty: i.qty,
-          variant_id: i.variant?.id || null,
-          variant_name: i.variant?.name || null,
-          variant_label: i.variant?.label || null
-        }))
-      };
-      if (!payload.email){ alert('Please enter your email.'); return; }
-
-      try{
-        concealSensitive(true);
-        setLoading(true);
-        const res = await fetch(API_URL, {
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify(payload)
-        });
-        const data = await res.json().catch(()=>null);
-        if(!res.ok || !data?.url) throw new Error(data?.error || 'Checkout error');
-        window.location = data.url;
-      }catch(err){
-        alert('Could not start checkout. Please try again.');
-        concealSensitive(false);
-      }finally{
-        setLoading(false);
-      }
+  // ------- Stripe Checkout redirect -------
+  async function startStripeCheckout(){
+    if (!CART.length){
+      alert('Your cart is empty.');
+      return;
     }
 
-    function setLoading(on){
-      els.overlay.classList.toggle('show', on);
-      els.payBtn.disabled = on;
-      if (els.appleBtn) els.appleBtn.disabled = on;
-      els.payBtn.textContent = on ? 'Redirecting…' : 'Pay';
+    const payload = {
+      email: (els.email?.value || '').trim(),   // backend sets customer_email from this
+      full_name: (els.fullName?.value || '').trim(),
+      address: (els.address?.value || '').trim(),
+      city: (els.city?.value || '').trim(),
+      state: (els.state?.value || '').trim(),
+      zip: (els.zip?.value || '').trim(),
+      country: els.country?.value || '',
+      ship_method: currentDelivery(),           // 'ship' or 'meet'
+      cart: CART.map(i => ({
+        sku: i.sku,
+        qty: i.qty,
+        variant_id: i.variant?.id || null,
+        variant_name: i.variant?.name || null,
+        variant_label: i.variant?.label || null
+      }))
+    };
+
+    if (!payload.email){
+      alert('Please enter your email.');
+      return;
     }
 
-    document.getElementById('payBtn').addEventListener('click', startStripeCheckout);
-    document.querySelector('.applepay-btn')?.addEventListener('click', startStripeCheckout);
-  </script>
+    try{
+      concealSensitive(true);
+      setLoading(true);
+      const res = await fetch(API_URL, {
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body: JSON.stringify(payload)
+      });
+      const data = await res.json().catch(()=>null);
+      if(!res.ok || !data?.url) throw new Error(data?.error || 'Checkout error');
+      window.location = data.url;
+    }catch(err){
+      console.error('Checkout error:', err);
+      alert('Could not start checkout. Please try again.');
+      concealSensitive(false);
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  function setLoading(on){
+    els.overlay.classList.toggle('show', on);
+    els.payBtn.disabled = on;
+    if (els.appleBtn) els.appleBtn.disabled = on;
+    els.payBtn.textContent = on ? 'Redirecting…' : 'Pay';
+  }
+
+  document.getElementById('payBtn').addEventListener('click', startStripeCheckout);
+  document.querySelector('.applepay-btn')?.addEventListener('click', startStripeCheckout);
+</script>
 </body>
 </html>
